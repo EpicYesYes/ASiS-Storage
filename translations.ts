@@ -13,7 +13,6 @@ export const translations = {
     loading: "Memulakan Sistem ASiS...",
     close: "Tutup",
     yes_confirm: "Ya, Sahkan",
-    // Added missing translation key
     confirm_delete_student: "Hapus rekod murid ini?",
     
     // Categories
@@ -177,7 +176,10 @@ export const translations = {
     acc_logout: "Log Keluar Sistem",
     acc_confirm_logout: "Log Keluar?",
     acc_logout_desc: "Adakah anda pasti mahu menamatkan sesi ini?",
-    acc_yes_confirm: "Ya, Sahkan"
+    acc_yes_confirm: "Ya, Sahkan",
+
+    // Login
+    login_remember_me: "Ingat Saya"
   },
   en: {
     // General
@@ -192,7 +194,6 @@ export const translations = {
     loading: "Starting ASiS System...",
     close: "Close",
     yes_confirm: "Yes, Confirm",
-    // Added missing translation key
     confirm_delete_student: "Delete this student record?",
     
     // Categories
@@ -356,7 +357,10 @@ export const translations = {
     acc_logout: "Sign Out",
     acc_confirm_logout: "Sign Out?",
     acc_logout_desc: "Are you sure you want to end this session?",
-    acc_yes_confirm: "Yes, Confirm"
+    acc_yes_confirm: "Yes, Confirm",
+
+    // Login
+    login_remember_me: "Remember Me"
   }
 };
 

@@ -144,6 +144,9 @@ const App: React.FC = () => {
     const savedColors = localStorage.getItem('asis_batch_colors');
     const savedTeachers = localStorage.getItem('asis_teachers');
     const savedCases = localStorage.getItem('asis_cases');
+    
+    // Check "Remember Me" status
+    const rememberMe = localStorage.getItem('asis_remember_me') === 'true';
     const savedUser = localStorage.getItem('asis_current_user');
     
     if (savedStudents) {
@@ -174,7 +177,8 @@ const App: React.FC = () => {
       setBatchColors(JSON.parse(savedColors));
     }
 
-    if (savedUser) {
+    // Only auto-login if rememberMe is enabled
+    if (rememberMe && savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
     
@@ -187,6 +191,7 @@ const App: React.FC = () => {
       localStorage.setItem('asis_batch_colors', JSON.stringify(batchColors));
       localStorage.setItem('asis_teachers', JSON.stringify(teachers));
       localStorage.setItem('asis_cases', JSON.stringify(cases));
+      
       if (currentUser) {
         localStorage.setItem('asis_current_user', JSON.stringify(currentUser));
       } else {
@@ -245,10 +250,11 @@ const App: React.FC = () => {
   };
 
   const handleAddBatch = (count: number) => {
-    const newStudents = generateMockStudents(count).map(s => ({
+    const newStudents = generateMockStudents(count).map((s, idx) => ({
       ...s,
       grade: 1,
-      classGroup: `1 ${CLASS_NAMES[Math.floor(Math.random() * CLASS_NAMES.length)]}`
+      // Distribute evenly across classes
+      classGroup: `1 ${CLASS_NAMES[idx % CLASS_NAMES.length]}`
     }));
     setStudents(prev => [...newStudents, ...prev]);
   };
@@ -282,8 +288,15 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('asis_remember_me');
+    localStorage.removeItem('asis_current_user');
     setCurrentUser(null);
     setActiveView('dashboard');
+  };
+
+  const handleLogin = (user: TeacherProfile, rememberMe: boolean) => {
+    localStorage.setItem('asis_remember_me', rememberMe ? 'true' : 'false');
+    setCurrentUser(user);
   };
 
   const selectedStudent = useMemo(() => {
@@ -294,6 +307,17 @@ const App: React.FC = () => {
   const navigateToDetail = (id: string) => {
     setSelectedStudentId(id);
     setActiveView('student-detail');
+  };
+
+  const handleBulkReassign = (reassignments: Record<string, { grade: number; classGroup: string }>) => {
+    setStudents(prev => {
+      // Filter out graduating students (who are not in reassignments but are Grade 5)
+      const graduatingIds = prev.filter(s => s.grade === 5).map(s => s.id);
+      
+      return prev
+        .filter(s => !graduatingIds.includes(s.id)) // Remove graduates
+        .map(s => reassignments[s.id] ? { ...s, ...reassignments[s.id] } : s); // Update grades/classes
+    });
   };
 
   if (!isLoaded) {
@@ -308,7 +332,7 @@ const App: React.FC = () => {
   }
 
   if (!currentUser) {
-    return <Login teachers={teachers} onLogin={(user) => setCurrentUser(user)} />;
+    return <Login teachers={teachers} onLogin={handleLogin} t={t} />;
   }
 
   return (
@@ -407,7 +431,7 @@ const App: React.FC = () => {
               onAddTeacher={(nt) => setTeachers(prev => [{ ...nt, id: `t-${Date.now()}`, meritsGiven: 0, demeritsGiven: 0, avatar: '' }, ...prev])}
               onRemoveTeacher={(id) => setTeachers(prev => prev.filter(t => t.id !== id))}
               onUpdateColors={setBatchColors}
-              onBulkReassign={(re) => setStudents(prev => prev.map(s => re[s.id] ? { ...s, ...re[s.id] } : s))}
+              onBulkReassign={handleBulkReassign}
               onAddBatch={handleAddBatch}
               onImportStudents={setStudents}
               onClearAll={() => { if(window.confirm("Kosongkan semua data?")) setStudents([]); }}

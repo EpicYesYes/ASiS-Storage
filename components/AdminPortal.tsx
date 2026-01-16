@@ -45,6 +45,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
   const [promotionData, setPromotionData] = useState<Record<string, { grade: number; classGroup: string }>>({});
   const [studentSearchQuery, setStudentSearchQuery] = useState('');
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [intakeCount, setIntakeCount] = useState(150);
 
   const [studentForm, setStudentForm] = useState({
     firstName: '',
@@ -77,10 +78,18 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
   };
 
   const handleFinalizePromotion = () => {
-    if (window.confirm('Confirm bulk promotion?')) {
+    const graduatingCount = students.filter(s => s.grade === 5).length;
+    if (window.confirm(`Confirm bulk promotion? ${graduatingCount} Form 5 students will graduate and be removed from active records.`)) {
       onBulkReassign(promotionData);
       setPromotionMode(false);
-      alert('Promotion complete.');
+      alert('Promotion complete. New academic session initialized.');
+    }
+  };
+
+  const handleAddIntake = () => {
+    if (window.confirm(`Adakah anda pasti mahu memasukkan ${intakeCount} murid Form 1 baharu?`)) {
+      onAddBatch(intakeCount);
+      alert(`${intakeCount} murid Form 1 telah berjaya didaftarkan.`);
     }
   };
 
@@ -121,6 +130,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
       setStudentToDelete(null);
     }
   };
+
+  const promotionRoadmap = useMemo(() => {
+    const counts: Record<number, number> = {};
+    GRADES.forEach(g => {
+      counts[g] = students.filter(s => s.grade === g).length;
+    });
+    return counts;
+  }, [students]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20 text-asis-text">
@@ -179,9 +196,53 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
         <div className="space-y-10">
           {!promotionMode ? (
             <>
+              {/* Promotion Summary Card */}
+              <div className="bg-[#0000bf] text-white p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group transition-all">
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-black tracking-tight">{t('adm_promotion')}</h3>
+                  <p className="opacity-60 font-medium max-w-xl italic">{t('adm_promotion_desc')}</p>
+                </div>
+                <button 
+                  onClick={handleStartPromotion} 
+                  className="px-12 py-5 bg-asis-primary !text-[#0000bf] font-black rounded-[2rem] shadow-2xl transition-all active:scale-95 flex items-center gap-3 whitespace-nowrap"
+                >
+                  {t('adm_promotion_start')}
+                </button>
+              </div>
+
+              {/* New Batch Intake Card */}
               <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-10 relative overflow-hidden transition-colors">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-asis-primary/5 rounded-bl-[8rem] -mr-12 -mt-12 opacity-40"></div>
+                <div className="flex items-center gap-4">
+                  <div className="w-4 h-12 bg-emerald-500 rounded-full"></div>
+                  <div>
+                    <h3 className="text-2xl font-black">Student Intake (Form 1 Batch)</h3>
+                    <p className="text-xs font-black opacity-40 uppercase tracking-widest">Enroll a new massive batch of students instantly</p>
+                  </div>
+                </div>
                 
+                <div className="flex flex-col sm:flex-row items-end gap-6 max-w-2xl">
+                  <div className="flex-1 space-y-2">
+                    <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Number of Students</label>
+                    <input 
+                      type="number" 
+                      className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black outline-none focus:border-asis-primary text-asis-text"
+                      value={intakeCount}
+                      onChange={(e) => setIntakeCount(Number(e.target.value))}
+                      min={1}
+                      max={200}
+                    />
+                  </div>
+                  <button 
+                    onClick={handleAddIntake}
+                    className="px-10 py-5 bg-emerald-500 !text-white font-black rounded-2xl shadow-xl hover:bg-emerald-600 transition-all active:scale-95 uppercase tracking-widest text-xs"
+                  >
+                    Induct New Batch
+                  </button>
+                </div>
+              </div>
+
+              {/* Registration Card */}
+              <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-10 relative overflow-hidden transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-4 h-12 bg-asis-primary rounded-full"></div>
                   <div>
@@ -232,13 +293,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                   </div>
 
                   <div className="flex justify-end pt-4">
-                    <button type="submit" className="px-12 py-5 bg-asis-primary text-[#0000bf] font-black rounded-3xl shadow-2xl hover:bg-asis-primaryHover transition-all active:scale-[0.98] flex items-center gap-3">
+                    <button type="submit" className="px-12 py-5 bg-asis-primary !text-[#0000bf] font-black rounded-3xl shadow-2xl hover:bg-asis-primaryHover transition-all active:scale-[0.98] flex items-center gap-3 uppercase tracking-widest text-xs">
                       {t('confirm')}
                     </button>
                   </div>
                 </form>
               </div>
 
+              {/* Student Directory Directory List */}
               <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8 transition-colors">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
@@ -275,13 +337,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                         <div className="flex items-center gap-3">
                           <button 
                             onClick={() => onSelectStudent(s.id)} 
-                            className="px-5 py-2.5 bg-asis-primary border border-asis-primaryHover text-[#0000bf] text-[10px] font-black uppercase rounded-xl hover:opacity-90 transition-all"
+                            className="px-5 py-2.5 bg-asis-primary border border-asis-primaryHover !text-[#0000bf] text-[10px] font-black uppercase rounded-xl hover:opacity-90 transition-all"
                           >
                             Profil
                           </button>
                           <button 
                             onClick={() => setStudentToDelete(s)} 
-                            className="px-5 py-2.5 bg-rose-500 border border-rose-600 text-[#0000bf] text-[10px] font-black uppercase rounded-xl hover:opacity-90 transition-all"
+                            className="px-5 py-2.5 bg-rose-500 border border-rose-600 !text-white text-[10px] font-black uppercase rounded-xl hover:opacity-90 transition-all"
                           >
                             Hapus
                           </button>
@@ -295,32 +357,69 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                   )}
                 </div>
               </div>
-
-              <div className="bg-[#0000bf] text-white p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group transition-colors">
-                <div className="space-y-2">
-                  <h3 className="text-3xl font-black tracking-tight">{t('adm_promotion')}</h3>
-                  <p className="opacity-60 font-medium max-w-xl italic">{t('adm_promotion_desc')}</p>
-                </div>
-                <button 
-                  onClick={handleStartPromotion} 
-                  className="px-12 py-5 bg-asis-primary text-[#0000bf] font-black rounded-[2rem] shadow-2xl transition-all active:scale-95 flex items-center gap-3 whitespace-nowrap"
-                >
-                  {t('adm_promotion_start')}
-                </button>
-              </div>
             </>
           ) : (
              <div className="space-y-8 animate-in zoom-in-95 duration-300">
               <div className="flex items-center justify-between">
                 <button onClick={() => setPromotionMode(false)} className="flex items-center gap-2 opacity-40 hover:opacity-100 font-black transition-colors uppercase text-[10px] tracking-widest">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
                   {t('back')}
                 </button>
-                <button onClick={handleFinalizePromotion} className="px-10 py-4 bg-emerald-500 text-[#0000bf] font-black rounded-2xl shadow-xl active:scale-95 border-2 border-emerald-600">
+                <button onClick={handleFinalizePromotion} className="px-10 py-4 bg-emerald-500 !text-white font-black rounded-2xl shadow-xl active:scale-95 border-2 border-emerald-600 uppercase tracking-widest text-xs">
                   {t('confirm')} ({Object.keys(promotionData).length})
                 </button>
               </div>
+
               <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl">
-                 <p className="text-center py-20 opacity-20 italic font-black">Antaramuka pemetaan kenaikan tingkatan sedia untuk dikonfigurasikan.</p>
+                 <h3 className="text-2xl font-black mb-10 text-center">Promotion Roadmap</h3>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 relative">
+                   {GRADES.map((g) => (
+                     <div key={g} className="relative flex flex-col items-center">
+                       <div className="w-full bg-asis-bg/30 p-8 rounded-[2rem] border-2 border-dashed border-asis-border text-center group hover:border-asis-primary transition-colors">
+                          <p className="text-[10px] font-black opacity-40 uppercase tracking-[0.2em] mb-2">Form {g}</p>
+                          <p className="text-4xl font-black mb-2">{promotionRoadmap[g] || 0}</p>
+                          <p className="text-[10px] font-black opacity-30">Students</p>
+                       </div>
+                       
+                       {g < 5 ? (
+                         <div className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 bg-asis-primary rounded-full items-center justify-center text-[#0000bf]">
+                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"/></svg>
+                         </div>
+                       ) : (
+                         <div className="absolute -bottom-12 flex flex-col items-center">
+                            <div className="w-1 h-8 bg-rose-500/20"></div>
+                            <span className="px-4 py-1.5 bg-rose-600 !text-white text-[10px] font-black uppercase rounded-lg shadow-lg">Graduating</span>
+                         </div>
+                       )}
+
+                       <div className="mt-6 flex flex-col items-center text-[#0000bf]">
+                          {g < 5 ? (
+                            <>
+                              <div className="w-1 h-6 bg-asis-primary"></div>
+                              <div className="px-4 py-2 bg-asis-primary rounded-xl font-black text-[10px] uppercase">Moves to Form {g+1}</div>
+                            </>
+                          ) : (
+                            <div className="h-6"></div>
+                          )}
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+
+                 <div className="mt-20 p-8 bg-asis-primary/10 rounded-[2rem] border border-asis-primary/20 max-w-3xl mx-auto">
+                    <div className="flex gap-4">
+                       <div className="w-12 h-12 bg-asis-primary rounded-2xl flex items-center justify-center text-[#0000bf] shrink-0">
+                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                       </div>
+                       <div className="space-y-1">
+                          <h4 className="font-black">What happens next?</h4>
+                          <p className="text-sm opacity-60 leading-relaxed">
+                            Semua murid yang aktif akan dinaikkan satu tingkatan. Murid di Tingkatan 5 akan dialih keluar daripada sistem bagi memberi ruang kepada pengambilan murid baharu. Rekod mata merit akan kekal bersama murid.
+                          </p>
+                       </div>
+                    </div>
+                 </div>
               </div>
             </div>
           )}
@@ -370,7 +469,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                 {t('adm_sys_danger')}
               </h3>
               <div className="flex gap-4">
-                 <button onClick={onClearAll} className="flex-1 py-5 bg-rose-500 text-[#0000bf] font-black rounded-2xl border-2 border-rose-600 hover:opacity-90 transition-all uppercase tracking-widest">
+                 <button onClick={onClearAll} className="flex-1 py-5 bg-rose-500 !text-white font-black rounded-2xl border-2 border-rose-600 hover:opacity-90 transition-all uppercase tracking-widest">
                    {t('adm_clear_all')}
                  </button>
               </div>

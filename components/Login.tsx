@@ -4,12 +4,14 @@ import { TeacherProfile } from '../types';
 
 interface LoginProps {
   teachers: TeacherProfile[];
-  onLogin: (teacher: TeacherProfile) => void;
+  onLogin: (teacher: TeacherProfile, rememberMe: boolean) => void;
+  t: (key: any) => string;
 }
 
-const Login: React.FC<LoginProps> = ({ teachers, onLogin }) => {
+const Login: React.FC<LoginProps> = ({ teachers, onLogin, t }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,7 +26,7 @@ const Login: React.FC<LoginProps> = ({ teachers, onLogin }) => {
       );
 
       if (teacher) {
-        onLogin(teacher);
+        onLogin(teacher, rememberMe);
       } else {
         setError('ID Staf atau kata laluan tidak sah. Sila cuba lagi.');
         setIsLoading(false);
@@ -74,6 +76,26 @@ const Login: React.FC<LoginProps> = ({ teachers, onLogin }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+
+            <div className="flex items-center justify-between px-1">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <div className="w-6 h-6 border-2 border-asis-border rounded-lg bg-asis-bg/30 peer-checked:bg-asis-primary peer-checked:border-asis-primary transition-all"></div>
+                  <svg className="absolute top-1 left-1 w-4 h-4 text-[#0000bf] opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-xs font-black opacity-60 group-hover:opacity-100 transition-opacity uppercase tracking-widest">
+                  {t('login_remember_me')}
+                </span>
+              </label>
             </div>
 
             {error && (
