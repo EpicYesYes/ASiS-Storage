@@ -46,18 +46,6 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
     setPendingUpdate({ type, reason: t(reasonKey as any), points, category });
   };
 
-  const handleCustomSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customReason) return;
-    const points = selectedType === BehaviorType.MERIT ? Math.abs(customPoints) : -Math.abs(customPoints);
-    setPendingUpdate({ 
-      type: selectedType, 
-      reason: customReason, 
-      points, 
-      category: selectedType === BehaviorType.MERIT ? 'Kustom' : undefined 
-    });
-  };
-
   const confirmUpdate = () => {
     if (pendingUpdate) {
       onUpdate(student.id, pendingUpdate);
@@ -79,7 +67,7 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
 
   const handleGenerateAvatar = async () => {
     setIsGeneratingAvatar(true);
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
@@ -92,9 +80,10 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
       const parts = response.candidates?.[0]?.content?.parts;
       if (parts) {
         for (const part of parts) {
-          if (part.inlineData) {
-            const base64EncodeString: string = part.inlineData.data;
-            onUpdateAvatar(student.id, `data:image/png;base64,${base64EncodeString}`);
+          // Explicitly check for data existence to satisfy TypeScript
+          if (part.inlineData && part.inlineData.data) {
+            const base64Data: string = part.inlineData.data;
+            onUpdateAvatar(student.id, `data:image/png;base64,${base64Data}`);
             break;
           }
         }
@@ -169,12 +158,21 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
                 accept="image/*" 
               />
               
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                className="mb-6 px-6 py-2 bg-asis-bg text-asis-text font-black rounded-xl border border-asis-border text-xs hover:bg-asis-primary transition-colors"
-              >
-                Tukar Foto
-              </button>
+              <div className="flex flex-col gap-2 mb-6">
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-6 py-2 bg-asis-bg text-asis-text font-black rounded-xl border border-asis-border text-xs hover:bg-asis-primary transition-colors"
+                >
+                  Tukar Foto
+                </button>
+                <button 
+                  onClick={handleGenerateAvatar}
+                  disabled={isGeneratingAvatar}
+                  className="px-6 py-2 bg-asis-text text-asis-bg font-black rounded-xl border border-asis-text text-xs hover:bg-asis-primary hover:text-asis-text transition-colors disabled:opacity-50"
+                >
+                  {isGeneratingAvatar ? 'Menjana AI...' : 'Jana Avatar AI'}
+                </button>
+              </div>
 
               <h2 className="text-3xl font-black leading-tight">{student.firstName} {student.lastName}</h2>
               <p className="font-black text-lg tracking-wide uppercase mt-3" style={{ color: houseColor }}>

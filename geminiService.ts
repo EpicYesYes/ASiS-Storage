@@ -1,9 +1,10 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { Student } from "../types";
+import { Student } from "./types";
 
 export const getBehaviorInsight = async (student: Student): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+  const apiKey = process.env.API_KEY || '';
+  const ai = new GoogleGenAI({ apiKey: apiKey as string });
   
   const recordSummary = student.records.map(r => 
     `${new Date(r.timestamp).toLocaleDateString()}: ${r.type} - ${r.reason} (${r.points} mata)`
