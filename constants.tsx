@@ -37,10 +37,15 @@ export const CLASS_NAMES = ['Amanah', 'Bestari', 'Cita', 'Dinamik'];
 
 export const NAME_SEPARATORS = [
   { value: 'bin', label: 'bin' },
+  { value: 'binti', label: 'binti' },
   { value: 'a/l', label: 'a/l' },
+  { value: 'a/p', label: 'a/p' },
   { value: 'anak', label: 'anak' },
   { value: '', label: 'Tiada (None)' }
 ];
+
+export const TEACHER_TITLES = ['Encik', 'Cik', 'Puan', 'Tuan', 'Madam', 'Miss', 'Mr.'];
+export const TEACHER_SEPARATORS = ['bin', 'binti', 'a/l', 'a/p', 'anak', '(none)'];
 
 export interface BehaviorReasonWithKey extends Omit<BehaviorReason, 'label'> {
   labelKey: string;
@@ -75,6 +80,10 @@ export const COMMON_REASONS: BehaviorReasonWithKey[] = [
 ];
 
 export const TEACHER_ROLES = [
+  'Penolong Kanan Pentadbiran',
+  'Penolong Kanan Hal Ehwal Murid',
+  'Penolong Kanan Kokurikulum',
+  'Guru Kanan Mata Pelajaran',
   'Penyelaras Tingkatan 1',
   'Penyelaras Tingkatan 2',
   'Penyelaras Tingkatan 3',
@@ -82,9 +91,8 @@ export const TEACHER_ROLES = [
   'Penyelaras Tingkatan 5',
   'Ketua Guru Rumah',
   'Guru Kelas',
-  'Penolong Kanan Pentadbiran',
-  'Penolong Kanan Hal Ehwal Murid',
-  'Pengetua'
+  'Warden',
+  'Guru Biasa'
 ];
 
 export const SUBJECT_CATEGORIES = {

@@ -113,7 +113,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ teacher, theme, setTheme, lan
                 <h2 className="text-4xl font-black leading-tight">{teacher.name}</h2>
                 <div className="flex flex-wrap gap-3 mt-3">
                   <span className="px-4 py-1.5 bg-asis-primary/20 text-asis-text font-black text-[10px] uppercase tracking-widest rounded-full border border-asis-primary/20">
-                    {teacher.role}
+                    {teacher.roles.join(', ')}
                   </span>
                   <span className="px-4 py-1.5 bg-asis-bg text-asis-text opacity-40 font-black text-[10px] uppercase tracking-widest rounded-full border border-asis-border">
                     ID: {teacher.staffId}
@@ -135,7 +135,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ teacher, theme, setTheme, lan
                 <div className="space-y-1">
                   <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Jawatan (Dikunci oleh Admin)</label>
                   <div className="w-full bg-asis-bg/10 border-2 border-asis-border rounded-2xl px-4 py-2 font-black opacity-30 cursor-not-allowed">
-                    {teacher.role}
+                    {teacher.roles.join(', ')}
                   </div>
                 </div>
               </div>

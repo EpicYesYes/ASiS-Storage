@@ -51,37 +51,31 @@
             color: var(--asis-text);
         }
 
-        /* Global Input/Select Logic */
         input, select, textarea {
             background-color: var(--asis-card) !important;
             color: var(--asis-text) !important;
             border-color: var(--asis-border) !important;
         }
 
-        /* Prevent browser defaults for options in light mode */
         option {
             background-color: var(--asis-card);
             color: var(--asis-text);
         }
 
-        /* Global Button Text Logic */
         button, .btn-transition {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* DEFAULT: Lavender text in dark mode, Deep blue in light mode */
         button {
             color: var(--asis-text) !important;
         }
 
-        /* GOLD STATE (Selected or Hovered): Forced Deep Blue text */
         button.bg-asis-primary,
         button:hover:not(.no-hover-gold),
         .active-gold-text {
             color: #0000bf !important;
         }
 
-        /* Exceptions for functional color buttons (Red/Green) */
         button.bg-rose-500, button.bg-rose-600, button.bg-emerald-500, button.bg-emerald-600 {
             color: #ffffff !important;
         }

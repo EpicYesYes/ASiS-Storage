@@ -71,7 +71,7 @@ export interface DisciplinaryCase {
 export interface TeacherProfile {
   id: string;
   name: string;
-  role: string;
+  roles: string[];
   email: string;
   staffId: string;
   department: string;

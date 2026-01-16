@@ -26,9 +26,6 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
   const [insight, setInsight] = useState<string | null>(null);
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
   const [activeMeritTab, setActiveMeritTab] = useState<MeritCategory>(MeritCategory.AKADEMIK);
-  const [selectedType, setSelectedType] = useState<BehaviorType>(BehaviorType.MERIT);
-  const [customReason, setCustomReason] = useState('');
-  const [customPoints, setCustomPoints] = useState(5);
   const [pendingUpdate, setPendingUpdate] = useState<PendingUpdate | null>(null);
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -42,26 +39,10 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
     setIsLoadingInsight(false);
   };
 
-  const handleReasonClick = (reasonKey: string, points: number, type: BehaviorType, category?: MeritCategory) => {
-    setPendingUpdate({ type, reason: t(reasonKey as any), points, category });
-  };
-
   const confirmUpdate = () => {
     if (pendingUpdate) {
       onUpdate(student.id, pendingUpdate);
       setPendingUpdate(null);
-      setCustomReason('');
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onUpdateAvatar(student.id, reader.result as string);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -80,10 +61,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
       const parts = response.candidates?.[0]?.content?.parts;
       if (parts) {
         for (const part of parts) {
-          // Explicitly check for data existence to satisfy TypeScript
-          if (part.inlineData && part.inlineData.data) {
-            const base64Data: string = part.inlineData.data;
-            onUpdateAvatar(student.id, `data:image/png;base64,${base64Data}`);
+          if (part.inlineData && typeof part.inlineData.data === 'string') {
+            onUpdateAvatar(student.id, `data:image/png;base64,${part.inlineData.data}`);
             break;
           }
         }
@@ -137,47 +116,18 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
             <div className="absolute top-0 left-0 w-full h-40 opacity-10" style={{ backgroundColor: houseColor }}></div>
             <div className="relative z-10">
               <div className="relative group mx-auto w-64 h-64 mb-8">
-                <img 
-                  src={student.avatar} 
-                  alt={student.firstName} 
-                  className="w-full h-full rounded-[2rem] object-cover shadow-2xl border-8 border-asis-card cursor-pointer transition-transform group-hover:scale-[1.02]" 
-                  onClick={() => fileInputRef.current?.click()}
-                />
-                <div 
-                  className="absolute inset-0 bg-black/40 rounded-[2rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer pointer-events-none"
-                >
-                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </div>
+                <img src={student.avatar} alt={student.firstName} className="w-full h-full rounded-[2rem] object-cover shadow-2xl border-8 border-asis-card cursor-pointer" onClick={() => fileInputRef.current?.click()} />
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) { const reader = new FileReader(); reader.onloadend = () => onUpdateAvatar(student.id, reader.result as string); reader.readAsDataURL(file); }
+                }} />
               </div>
-              
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
-                className="hidden" 
-                accept="image/*" 
-              />
-              
               <div className="flex flex-col gap-2 mb-6">
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-6 py-2 bg-asis-bg text-asis-text font-black rounded-xl border border-asis-border text-xs hover:bg-asis-primary transition-colors"
-                >
-                  Tukar Foto
-                </button>
-                <button 
-                  onClick={handleGenerateAvatar}
-                  disabled={isGeneratingAvatar}
-                  className="px-6 py-2 bg-asis-text text-asis-bg font-black rounded-xl border border-asis-text text-xs hover:bg-asis-primary hover:text-asis-text transition-colors disabled:opacity-50"
-                >
-                  {isGeneratingAvatar ? 'Menjana AI...' : 'Jana Avatar AI'}
-                </button>
+                <button onClick={() => fileInputRef.current?.click()} className="px-6 py-2 bg-asis-bg text-asis-text font-black rounded-xl border border-asis-border text-xs hover:bg-asis-primary">Tukar Foto</button>
+                <button onClick={handleGenerateAvatar} disabled={isGeneratingAvatar} className="px-6 py-2 bg-asis-text text-asis-bg font-black rounded-xl border border-asis-text text-xs hover:bg-asis-primary hover:text-asis-text disabled:opacity-50">{isGeneratingAvatar ? 'Menjana...' : 'Jana Avatar AI'}</button>
               </div>
-
               <h2 className="text-3xl font-black leading-tight">{student.firstName} {student.lastName}</h2>
-              <p className="font-black text-lg tracking-wide uppercase mt-3" style={{ color: houseColor }}>
-                {student.house} • {t('grade_prefix')} {student.grade} {student.classGroup.split(' ')[1]}
-              </p>
+              <p className="font-black text-lg tracking-wide uppercase mt-3" style={{ color: houseColor }}>{student.house} • {student.grade} {student.classGroup.split(' ')[1]}</p>
               <div className="bg-asis-bg/30 p-8 rounded-3xl mt-10">
                 <p className="text-xs opacity-40 font-black uppercase tracking-[0.2em] mb-2">{t('sd_total_merit')}</p>
                 <p className={`text-6xl font-black ${student.totalPoints >= 100 ? 'text-emerald-500' : 'text-rose-500'}`}>{student.totalPoints}</p>
@@ -187,8 +137,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
           <div className="bg-asis-text text-asis-bg p-8 rounded-[2.5rem] shadow-2xl">
             <h3 className="text-xl font-black mb-4">{t('sd_ai_analysis')}</h3>
             <p className="opacity-60 text-sm mb-6 leading-relaxed">{insight || t('sd_ai_desc')}</p>
-            <button onClick={handleGenerateInsight} disabled={isLoadingInsight} className="w-full text-asis-text font-black py-4 rounded-2xl bg-asis-primary shadow-lg hover:bg-asis-primaryHover transition-all">
-              {isLoadingInsight ? t('sd_ai_generating') : (insight ? t('sd_ai_retry') : t('sd_ai_generate'))}
+            <button onClick={handleGenerateInsight} disabled={isLoadingInsight} className="w-full text-asis-text font-black py-4 rounded-2xl bg-asis-primary shadow-lg">
+              {isLoadingInsight ? t('sd_ai_generating') : t('sd_ai_generate')}
             </button>
           </div>
         </div>
@@ -208,19 +158,15 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[300px]">
-                {COMMON_REASONS.filter(r => (activeMeritTab as any) === 'DEMERIT' ? r.type === BehaviorType.DEMERIT : r.category === activeMeritTab).map(reason => {
-                  const catColor = reason.type === BehaviorType.DEMERIT ? '#ef4444' : MERIT_CATEGORY_COLORS[reason.category!];
-                  return (
-                    <button key={reason.id} onClick={() => handleReasonClick(reason.labelKey, reason.points, reason.type, reason.category)} className="w-full text-left p-6 rounded-3xl border-2 transition-all flex justify-between items-center group bg-asis-bg/10 hover:bg-asis-bg/30" style={{ borderColor: 'var(--asis-border)' }}>
-                      <span className="font-black text-asis-text">{t(reason.labelKey as any)}</span>
-                      <span className="font-black text-xl" style={{ color: catColor }}>{reason.points > 0 ? `+${reason.points}` : reason.points}</span>
-                    </button>
-                  );
-                })}
+                {COMMON_REASONS.filter(r => (activeMeritTab as any) === 'DEMERIT' ? r.type === BehaviorType.DEMERIT : r.category === activeMeritTab).map(reason => (
+                  <button key={reason.id} onClick={() => setPendingUpdate({ type: reason.type, reason: t(reason.labelKey as any), points: reason.points, category: reason.category })} className="w-full text-left p-6 rounded-3xl border-2 border-asis-border hover:bg-asis-bg/30 flex justify-between items-center transition-all">
+                    <span className="font-black text-asis-text">{t(reason.labelKey as any)}</span>
+                    <span className="font-black text-xl" style={{ color: reason.points > 0 ? '#10b981' : '#ef4444' }}>{reason.points > 0 ? `+${reason.points}` : reason.points}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
-
           <div className="bg-asis-card p-10 rounded-[2.5rem] border border-asis-border shadow-xl">
             <h3 className="text-2xl font-black mb-8">{t('sd_timeline')}</h3>
             <div className="space-y-4">

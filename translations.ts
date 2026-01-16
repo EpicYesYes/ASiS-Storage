@@ -15,6 +15,16 @@ export const translations = {
     yes_confirm: "Ya, Sahkan",
     confirm_delete_student: "Hapus rekod murid ini?",
     
+    // Cloud Sync
+    sync_title: "Pusat Sinkronisasi Awan",
+    sync_desc: "Sambungkan peranti anda ke pangkalan data sekolah pusat.",
+    sync_key_label: "Kunci Sinkronisasi Sekolah",
+    sync_push: "Tolak Data (Hantar)",
+    sync_pull: "Tarik Data (Ambil)",
+    sync_status_online: "Berhubung dengan Awan",
+    sync_status_offline: "Mod Luar Talian",
+    sync_last: "Terakhir dikemas kini",
+
     // Categories
     cat_akademik: "Akademik",
     cat_koko: "Kokurikulum",
@@ -62,7 +72,7 @@ export const translations = {
     sl_sort_points: "Mata",
     sl_order_asc: "MENAIK",
     sl_order_desc: "MENURUN",
-    sl_select_all: "Pilih Semua",
+    sl_select_all: "Pilih Semua Mengikut Tapis",
     sl_deselect_all: "Nyahpilih Semua",
     sl_batch_mode: "Mod Kemasukan Massa",
     sl_give_points: "Berikan Mata",
@@ -195,6 +205,16 @@ export const translations = {
     close: "Close",
     yes_confirm: "Yes, Confirm",
     confirm_delete_student: "Delete this student record?",
+
+    // Cloud Sync
+    sync_title: "Cloud Sync Center",
+    sync_desc: "Connect your device to a central school database.",
+    sync_key_label: "School Sync Key",
+    sync_push: "Push Data (Upload)",
+    sync_pull: "Pull Data (Download)",
+    sync_status_online: "Cloud Connected",
+    sync_status_offline: "Offline Mode",
+    sync_last: "Last updated",
     
     // Categories
     cat_akademik: "Academic",
@@ -243,7 +263,7 @@ export const translations = {
     sl_sort_points: "Points",
     sl_order_asc: "ASCENDING",
     sl_order_desc: "DESCENDING",
-    sl_select_all: "Select All",
+    sl_select_all: "Select All Filtered",
     sl_deselect_all: "Deselect All",
     sl_batch_mode: "Bulk Entry Mode",
     sl_give_points: "Give Points",
