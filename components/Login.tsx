@@ -85,11 +85,11 @@ const Login: React.FC<LoginProps> = ({ teachers, onLogin }) => {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full py-5 bg-asis-primary text-[#0000bf] !font-black rounded-2xl shadow-xl hover:bg-asis-primaryHover transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3 uppercase tracking-widest"
+              className="w-full py-5 bg-asis-primary !text-[#0000bf] !font-black rounded-2xl shadow-xl hover:bg-asis-primaryHover transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3 uppercase tracking-widest"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-[#0000bf]/30 border-t-[#0000bf] rounded-full animate-spin"></div>
-              ) : 'Log Masuk'}
+              ) : 'LOG MASUK'}
             </button>
           </form>
 

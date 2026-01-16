@@ -19,7 +19,6 @@
                             primaryHover: '#e6ac00',
                             card: 'var(--asis-card)',
                             border: 'var(--asis-border)',
-                            btnText: '#0000bf',
                         }
                     },
                     fontFamily: {
@@ -51,9 +50,42 @@
             background-color: var(--asis-bg);
             color: var(--asis-text);
         }
-        button, a.btn-style {
+
+        /* Global Input/Select Logic */
+        input, select, textarea {
+            background-color: var(--asis-card) !important;
+            color: var(--asis-text) !important;
+            border-color: var(--asis-border) !important;
+        }
+
+        /* Prevent browser defaults for options in light mode */
+        option {
+            background-color: var(--asis-card);
+            color: var(--asis-text);
+        }
+
+        /* Global Button Text Logic */
+        button, .btn-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* DEFAULT: Lavender text in dark mode, Deep blue in light mode */
+        button {
+            color: var(--asis-text) !important;
+        }
+
+        /* GOLD STATE (Selected or Hovered): Forced Deep Blue text */
+        button.bg-asis-primary,
+        button:hover:not(.no-hover-gold),
+        .active-gold-text {
             color: #0000bf !important;
         }
+
+        /* Exceptions for functional color buttons (Red/Green) */
+        button.bg-rose-500, button.bg-rose-600, button.bg-emerald-500, button.bg-emerald-600 {
+            color: #ffffff !important;
+        }
+
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -61,19 +93,10 @@
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: #0000bf;
+            background: #ffbf00;
             border-radius: 4px;
-            opacity: 0.3;
-        }
-        /* Custom accessibility focus */
-        :focus-visible {
-            outline: 2px solid #ffbf00;
-            outline-offset: 2px;
         }
         .asis-card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 191, 0.1);
-        }
-        .dark .asis-card-shadow {
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
     </style>

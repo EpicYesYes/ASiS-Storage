@@ -43,20 +43,23 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isOpen, onClose,
       </div>
 
       <nav className="flex-1 px-4 mt-6 space-y-2">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setView(item.id as View)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-[#0000bf] !font-black ${
-              activeView === item.id || (activeView === 'student-detail' && item.id === 'students')
-                ? 'bg-asis-primary shadow-lg shadow-asis-primary/20' 
-                : 'hover:bg-asis-text/10'
-            }`}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {items.map((item) => {
+          const isActive = activeView === item.id || (activeView === 'student-detail' && item.id === 'students');
+          return (
+            <button
+              key={item.id}
+              onClick={() => setView(item.id as View)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-black ${
+                isActive
+                  ? 'bg-asis-primary shadow-lg shadow-asis-primary/20' 
+                  : 'bg-transparent hover:bg-asis-primary'
+              }`}
+            >
+              {item.icon}
+              <span className="truncate">{item.label}</span>
+            </button>
+          );
+        })}
       </nav>
 
       <div className="p-6 mt-auto">

@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Student, BehaviorType, MeritCategory } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend, PieChart, Pie } from 'recharts';
-import { HOUSE_COLORS, HOUSES, GRADES, formatShortName, MERIT_CATEGORY_COLORS } from '../constants';
+import { HOUSE_COLORS, HOUSES, GRADES, formatShortName, MERIT_CATEGORY_COLORS, HOUSE_INITIAL_POINTS } from '../constants';
 
 interface DashboardProps {
   students: Student[];
@@ -32,23 +32,35 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     setIsMounted(true);
   }, []);
 
+  const allClassGroups = useMemo(() => {
+    const groups = new Set<string>();
+    students.forEach(s => groups.add(s.classGroup));
+    return Array.from(groups).sort();
+  }, [students]);
+
   const stats = useMemo(() => {
     let totalMerits = 0;
     let totalDemerits = 0;
     const housePointsMap = HOUSES.reduce((acc, house) => {
-      acc[house] = { merits: 0, demerits: 0 };
+      const initial = HOUSE_INITIAL_POINTS[house] || { merits: 0, demerits: 0 };
+      acc[house] = { ...initial };
+      totalMerits += initial.merits;
+      totalDemerits += initial.demerits;
       return acc;
     }, {} as Record<string, { merits: number; demerits: number }>);
+
     const batchPointsMap = GRADES.reduce((acc, grade) => {
       acc[grade] = { merits: 0, demerits: 0 };
       return acc;
     }, {} as Record<number, { merits: number; demerits: number }>);
+
     const categoryPointsMap = {
       [MeritCategory.AKADEMIK]: 0,
       [MeritCategory.KOKURIKULUM]: 0,
       [MeritCategory.SAHSIAH]: 0,
       [MeritCategory.TIGAK]: 0,
     };
+
     students.forEach(s => {
       s.records.forEach(r => {
         const points = Math.abs(r.points);
@@ -109,12 +121,6 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     { name: t('cat_3k'), value: stats.categoryPointsMap[MeritCategory.TIGAK], color: MERIT_CATEGORY_COLORS[MeritCategory.TIGAK] },
   ].filter(d => d.value > 0);
 
-  const allClassGroups = useMemo(() => {
-    const groups = new Set<string>();
-    students.forEach(s => groups.add(s.classGroup));
-    return Array.from(groups).sort();
-  }, [students]);
-
   const handleFilterTypeChange = (type: RankFilterType) => {
     setFilterType(type);
     if (type === 'all') setFilterValue('');
@@ -126,10 +132,10 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
   const renderStudentCard = (student: Student, isTop: boolean, index: number) => (
     <div 
       key={student.id} 
-      className="flex flex-col items-center p-4 rounded-3xl hover:bg-asis-bg/40 transition-all cursor-pointer text-center group border border-transparent hover:border-asis-border relative"
+      className="flex flex-col items-center p-4 rounded-3xl hover:bg-asis-primary transition-all cursor-pointer text-center group border border-transparent hover:border-asis-border relative"
       onClick={() => onSelectStudent(student.id)}
     >
-      <div className="absolute top-2 left-2 z-10 w-6 h-6 rounded-full bg-asis-text text-asis-bg text-[10px] font-black flex items-center justify-center shadow-md">
+      <div className="absolute top-2 left-2 z-10 w-6 h-6 rounded-full bg-asis-card text-asis-text text-[10px] font-black flex items-center justify-center shadow-md">
         #{index + 1}
       </div>
       <div className="relative mb-3">
@@ -145,10 +151,10 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
           {student.house[0]}
         </div>
       </div>
-      <h4 className="font-black text-asis-text truncate w-full text-xs leading-tight">
+      <h4 className="font-black truncate w-full text-xs leading-tight transition-colors">
         {formatShortName(student.firstName, student.lastName)}
       </h4>
-      <p className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-40">{student.classGroup}</p>
+      <p className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-40 group-hover:opacity-70">{student.classGroup}</p>
       <div className={`mt-2 text-base font-black ${isTop ? 'text-emerald-500' : 'text-rose-500'}`}>
         {student.totalPoints} <span className="text-[8px] uppercase font-black opacity-70">pts</span>
       </div>
@@ -159,7 +165,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     <div className="space-y-8 pb-20 text-asis-text">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-asis-card p-6 rounded-3xl border border-asis-border shadow-sm flex items-center gap-4 transition-colors duration-300">
-          <div className="w-12 h-12 bg-asis-text/10 rounded-2xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-asis-primary/20 rounded-2xl flex items-center justify-center text-asis-primary">
              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           </div>
           <div>
@@ -207,7 +213,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
                       <XAxis dataKey="display" axisLine={false} tickLine={false} tick={{fill: 'var(--asis-text)', fontSize: 11, fontWeight: 'bold'}} />
                       <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--asis-text)', fontSize: 10}} />
                       <Tooltip 
-                        cursor={{fill: 'rgba(255, 191, 0, 0.05)'}} 
+                        cursor={{fill: 'rgba(255, 191, 0, 0.1)'}} 
                         labelFormatter={(_, items) => items[0]?.payload?.fullName || ''}
                         contentStyle={{ borderRadius: '16px', border: 'none', backgroundColor: '#ffbf00', color: '#0000bf', fontWeight: '900' }} 
                         itemStyle={{ color: '#0000bf', fontWeight: 'bold' }}
@@ -250,14 +256,40 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
             <h3 className="text-2xl font-black">{t('dash_analysis')}</h3>
             <p className="opacity-60 text-sm font-medium italic">{t('sd_ai_desc')}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex bg-asis-card p-1 rounded-2xl shadow-sm border border-asis-border">
               {(['all', 'grade', 'house', 'class'] as RankFilterType[]).map((type) => (
-                <button key={type} onClick={() => handleFilterTypeChange(type)} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterType === type ? 'bg-asis-primary' : 'opacity-40 hover:opacity-100'}`}>
+                <button 
+                  key={type} 
+                  onClick={() => handleFilterTypeChange(type)} 
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterType === type ? 'bg-asis-primary' : 'bg-transparent'}`}
+                >
                   {type === 'all' ? t('dash_filter_school') : type === 'grade' ? t('dash_filter_batch') : type === 'house' ? t('dash_filter_house') : t('dash_filter_class')}
                 </button>
               ))}
             </div>
+
+            {filterType !== 'all' && (
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
+                <select 
+                  value={filterValue} 
+                  onChange={(e) => setFilterValue(e.target.value)}
+                  className="bg-asis-card border-2 border-asis-border rounded-xl px-4 py-2 text-xs font-black outline-none focus:border-asis-primary text-asis-text cursor-pointer appearance-none pr-8"
+                  style={{ backgroundImage: 'none' }}
+                >
+                  {filterType === 'grade' && GRADES.map(g => (
+                    <option key={g} value={g}>{t('grade_prefix')} {g}</option>
+                  ))}
+                  {filterType === 'house' && HOUSES.map(h => (
+                    <option key={h} value={h}>{h}</option>
+                  ))}
+                  {filterType === 'class' && allClassGroups.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
 
@@ -269,6 +301,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
             <div key={i} className={`bg-asis-card/40 p-6 sm:p-8 rounded-[2.5rem] border border-asis-border space-y-6 relative overflow-hidden group`}>
               <div className="flex items-center justify-between border-b border-asis-border pb-4">
                  <h4 className={`text-xs font-black text-${sec.color}-500 uppercase tracking-[0.2em]`}>{sec.title}</h4>
+                 {filterType !== 'all' && <span className="text-[10px] font-black opacity-30 uppercase tracking-widest">{filterValue}</span>}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2">
                 {sec.data.length > 0 ? sec.data.map((s, idx) => renderStudentCard(s, sec.isTop, idx)) : <div className="col-span-full py-10 text-center opacity-40 italic font-black">{t('dash_no_data')}</div>}

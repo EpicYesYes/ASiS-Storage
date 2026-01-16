@@ -10,6 +10,13 @@ export const HOUSE_COLORS: Record<string, string> = {
   'Bendahara': '#3b82f6'   // Biru
 };
 
+export const HOUSE_INITIAL_POINTS: Record<string, { merits: number; demerits: number }> = {
+  'Temenggong': { merits: 0, demerits: 0 },
+  'Syahbandar': { merits: 0, demerits: 0 },
+  'Laksamana': { merits: 0, demerits: 0 },
+  'Bendahara': { merits: 0, demerits: 0 }
+};
+
 export const MERIT_CATEGORY_COLORS: Record<string, string> = {
   [MeritCategory.AKADEMIK]: '#6366f1',    // Indigo
   [MeritCategory.KOKURIKULUM]: '#f59e0b', // Amber
