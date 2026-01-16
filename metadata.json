@@ -1,0 +1,5 @@
+{
+  "name": "ASiS - Sistem Pengurusan Merit",
+  "description": "Aplikasi guru SM Sains Alam Shah untuk menguruskan dan melihat markah merit dan demerit bagi setiap murid.",
+  "requestFramePermissions": []
+}

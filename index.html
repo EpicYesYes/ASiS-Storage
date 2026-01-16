@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASiS - Sistem Pengurusan Merit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        asis: {
+                            bg: 'var(--asis-bg)',
+                            text: 'var(--asis-text)',
+                            primary: '#ffbf00',
+                            primaryHover: '#e6ac00',
+                            card: 'var(--asis-card)',
+                            border: 'var(--asis-border)',
+                            btnText: '#0000bf',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --asis-bg: #d8d8ff;
+            --asis-text: #0000bf;
+            --asis-card: #ffffff;
+            --asis-border: rgba(0, 0, 191, 0.1);
+        }
+        .dark {
+            --asis-bg: #000080;
+            --asis-text: #d8d8ff;
+            --asis-card: #000066;
+            --asis-border: rgba(216, 216, 255, 0.1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: var(--asis-bg);
+            color: var(--asis-text);
+        }
+        button, a.btn-style {
+            color: #0000bf !important;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0000bf;
+            border-radius: 4px;
+            opacity: 0.3;
+        }
+        /* Custom accessibility focus */
+        :focus-visible {
+            outline: 2px solid #ffbf00;
+            outline-offset: 2px;
+        }
+        .asis-card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 191, 0.1);
+        }
+        .dark .asis-card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.36.0",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+</head>
+<body class="bg-asis-bg text-asis-text">
+    <div id="root"></div>
+</body>
+</html>
