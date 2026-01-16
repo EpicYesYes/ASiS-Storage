@@ -51,11 +51,14 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
     perpetratorQuery: '', victimQuery: '', selectedPerpetrators: [] as string[], selectedVictims: [] as string[]
   });
 
-  const statusLabels = {
-    'ALL': 'Semua Status',
-    [CaseStatus.PENDING]: 'Pending',
-    [CaseStatus.INVESTIGATING]: 'Investigating',
-    [CaseStatus.RESOLVED]: 'Resolved'
+  const getStatusLabel = (status: CaseStatus | 'ALL') => {
+    if (status === 'ALL') return 'Semua Status';
+    switch (status) {
+      case CaseStatus.PENDING: return t('status_pending');
+      case CaseStatus.INVESTIGATING: return t('status_investigating');
+      case CaseStatus.RESOLVED: return t('status_resolved');
+      default: return status;
+    }
   };
 
   const getTranslatedCategory = (val: string) => {
@@ -123,13 +126,6 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
     setShowAddModal(false);
   };
 
-  const perpetratorResults = useMemo(() => {
-    if (!formData.perpetratorQuery) return [];
-    return students.filter(s => 
-      `${s.firstName} ${s.lastName}`.toLowerCase().includes(formData.perpetratorQuery.toLowerCase())
-    ).slice(0, 5);
-  }, [students, formData.perpetratorQuery]);
-
   return (
     <div className="space-y-8 pb-20 animate-in fade-in duration-500 text-asis-text">
       <div className="bg-asis-card p-6 sm:p-8 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -172,7 +168,7 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
                   : 'bg-asis-card opacity-50 hover:opacity-100 border-asis-border'
               }`}
             >
-              {statusLabels[status]}
+              {getStatusLabel(status)}
             </button>
           ))}
         </div>
@@ -222,67 +218,13 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
               <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
                 c.status === CaseStatus.RESOLVED ? 'bg-emerald-500/10 text-emerald-500' : 'bg-asis-bg opacity-40'
               }`}>
-                {statusLabels[c.status]}
+                {getStatusLabel(c.status)}
               </span>
               <p className="text-[10px] font-black opacity-20">{new Date(c.date).toLocaleDateString()}</p>
             </div>
           </div>
         ))}
-        {filteredCases.length === 0 && <div className="col-span-full py-20 text-center opacity-30 italic font-black">Tiada kes disiplin ditemui.</div>}
       </div>
-
-      {selectedCase && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-asis-card rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl max-w-4xl w-full p-8 sm:p-12 overflow-y-auto max-h-[90vh] relative border border-asis-border">
-            <button onClick={() => setSelectedCase(null)} className="absolute top-6 right-6 opacity-20 hover:opacity-100 transition-all p-2 rounded-full hover:bg-asis-bg">
-              <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-            <div className="space-y-8">
-              <h2 className="text-2xl sm:text-4xl font-black">{selectedCase.title}</h2>
-              <p className="bg-asis-bg/30 p-6 rounded-[2rem] italic opacity-80 text-sm">"{selectedCase.description}"</p>
-              
-              <div>
-                <h4 className="text-[10px] font-black opacity-40 uppercase tracking-widest mb-4">Murid Terlibat</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {selectedCase.perpetratorIds.map(pid => {
-                    const s = students.find(st => st.id === pid);
-                    return s ? (
-                      <div key={pid} className="flex items-center justify-between bg-asis-bg/20 px-4 py-3 rounded-2xl border border-asis-border">
-                        <span className="text-sm font-black">{formatShortName(s.firstName, s.lastName)}</span>
-                        <button onClick={() => setPenaltyTarget({ studentId: pid, caseId: selectedCase.id })} className="px-3 py-1.5 bg-rose-600 !text-white text-[9px] font-black uppercase rounded-lg">Demerit</button>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-
-              {selectedCase.status !== CaseStatus.RESOLVED && (
-                <div className="space-y-4">
-                  <textarea className="w-full bg-asis-bg/10 border border-asis-border rounded-2xl px-6 py-4 outline-none focus:border-asis-primary font-bold" placeholder="Masukkan keputusan rasmi..." value={finalDecision} onChange={e => setFinalDecision(e.target.value)} />
-                  <button onClick={handleResolveCase} className="w-full py-4 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase tracking-widest text-sm">REDAKSI KEPUTUSAN</button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAddModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-asis-card rounded-[2.5rem] shadow-2xl max-w-2xl w-full p-10 border-t-8 border-asis-primary">
-            <h2 className="text-2xl font-black mb-8">Pendaftaran Kes Baru</h2>
-            <form onSubmit={handleAddCaseSubmit} className="space-y-4">
-              <input required className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Tajuk Kes" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
-              <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                {CATEGORIES.map(c => <option key={c.key} value={c.value}>{t(c.key as any)}</option>)}
-              </select>
-              <textarea className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Huraian Kes..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-              <button type="submit" className="w-full py-4 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase tracking-widest">Daftar Kes</button>
-              <button type="button" onClick={() => setShowAddModal(false)} className="w-full py-4 opacity-40 font-black">Batal</button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

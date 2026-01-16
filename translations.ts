@@ -3,7 +3,7 @@ export const translations = {
   ms: {
     // General
     school_name: "SM Sains Alam Shah",
-    system_status: "Sistem Status",
+    system_status: "Status Sistem",
     active_safe: "Aktif & Selamat",
     back: "Kembali",
     cancel: "Batal",
@@ -50,12 +50,12 @@ export const translations = {
     dash_demerit_total: "Demerit Terkumpul",
     dash_house_dist: "Taburan Rumah",
     dash_batch_dist: "Taburan Tingkatan",
-    dash_merit_cat: "Merit Kategori",
+    dash_merit_cat: "Kategori Merit",
     dash_analysis: "Analisis Prestasi Murid",
     dash_stars: "Bintang ASiS (Tertinggi)",
     dash_attention: "Perlukan Perhatian (Terendah)",
     dash_filter_school: "Sekolah",
-    dash_filter_batch: "Batch",
+    dash_filter_batch: "Tingkatan",
     dash_filter_house: "Rumah",
     dash_filter_class: "Kelas",
     dash_no_data: "Tiada data tersedia.",
@@ -84,7 +84,7 @@ export const translations = {
     sd_back_dir: "Kembali ke Direktori",
     sd_total_merit: "Jumlah Mata Merit",
     sd_ai_analysis: "Analisis Tingkah Laku AI",
-    sd_ai_desc: "Jana analisis tingkah laku mengikut konteks menggunakan Gemini.",
+    sd_ai_desc: "Jana ulasan tingkah laku profesional menggunakan AI.",
     sd_ai_generate: "Analisis Tingkah Laku",
     sd_ai_generating: "Menjana...",
     sd_ai_retry: "Jana Semula Analisis",
@@ -124,8 +124,8 @@ export const translations = {
     case_involved: "Murid Terlibat:",
     case_detail_desc: "Huraian Kes",
     case_location: "Lokasi Kejadian",
-    case_perps: "Murid Terlibat (Pelaku)",
-    case_victims: "Murid Terlibat (Mangsa)",
+    case_perps: "Pelaku",
+    case_victims: "Mangsa",
     case_decision_sec: "Keputusan & Tindakan Selesai",
     case_decision_placeholder: "Masukkan tindakan disiplin atau keputusan rasmi...",
     case_penalty: "Berikan Demerit",
@@ -147,6 +147,11 @@ export const translations = {
     sev_minor: "Ringan",
     sev_major: "Sederhana",
     sev_severe: "Berat",
+
+    // Status
+    status_pending: "Menunggu",
+    status_investigating: "Siasatan",
+    status_resolved: "Selesai",
 
     // Admin
     adm_title: "Portal Pentadbiran",
@@ -246,7 +251,7 @@ export const translations = {
     dash_stars: "ASiS Stars (Highest)",
     dash_attention: "Needs Attention (Lowest)",
     dash_filter_school: "School",
-    dash_filter_batch: "Batch",
+    dash_filter_batch: "Form",
     dash_filter_house: "House",
     dash_filter_class: "Class",
     dash_no_data: "No data available.",
@@ -275,7 +280,7 @@ export const translations = {
     sd_back_dir: "Back to Directory",
     sd_total_merit: "Total Merit Points",
     sd_ai_analysis: "AI Behavior Analysis",
-    sd_ai_desc: "Generate contextual behavior insights using Gemini.",
+    sd_ai_desc: "Generate professional behavior insights using AI.",
     sd_ai_generate: "Behavioral Analysis",
     sd_ai_generating: "Generating...",
     sd_ai_retry: "Regenerate Analysis",
@@ -315,8 +320,8 @@ export const translations = {
     case_involved: "Involved Students:",
     case_detail_desc: "Case Description",
     case_location: "Incident Location",
-    case_perps: "Involved Students (Perpetrators)",
-    case_victims: "Involved Students (Victims)",
+    case_perps: "Perpetrators",
+    case_victims: "Victims",
     case_decision_sec: "Resolution & Actions",
     case_decision_placeholder: "Enter disciplinary action or official decision...",
     case_penalty: "Apply Demerit",
@@ -338,6 +343,11 @@ export const translations = {
     sev_minor: "Minor",
     sev_major: "Major",
     sev_severe: "Severe",
+
+    // Status
+    status_pending: "Pending",
+    status_investigating: "Investigating",
+    status_resolved: "Resolved",
 
     // Admin
     adm_title: "Administration Portal",

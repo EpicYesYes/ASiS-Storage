@@ -48,7 +48,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
 
   const handleGenerateAvatar = async () => {
     setIsGeneratingAvatar(true);
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+    const apiKey = process.env.API_KEY || '';
+    const ai = new GoogleGenAI({ apiKey: apiKey as string });
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
@@ -112,23 +113,28 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-1 space-y-8">
-          <div className="bg-asis-card p-10 rounded-[2.5rem] border border-asis-border shadow-xl text-center relative overflow-hidden">
+          <div className="bg-asis-card p-10 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col items-center relative overflow-hidden text-center">
             <div className="absolute top-0 left-0 w-full h-40 opacity-10" style={{ backgroundColor: houseColor }}></div>
-            <div className="relative z-10">
-              <div className="relative group mx-auto w-64 h-64 mb-8">
-                <img src={student.avatar} alt={student.firstName} className="w-full h-full rounded-[2rem] object-cover shadow-2xl border-8 border-asis-card cursor-pointer" onClick={() => fileInputRef.current?.click()} />
+            <div className="relative z-10 w-full flex flex-col items-center">
+              <div className="relative group w-64 h-64 mb-8 flex items-center justify-center bg-asis-bg/20 rounded-[2rem] overflow-hidden">
+                <img 
+                  src={student.avatar} 
+                  alt={student.firstName} 
+                  className="w-full h-full object-cover shadow-2xl border-8 border-asis-card cursor-pointer" 
+                  onClick={() => fileInputRef.current?.click()} 
+                />
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) { const reader = new FileReader(); reader.onloadend = () => onUpdateAvatar(student.id, reader.result as string); reader.readAsDataURL(file); }
                 }} />
               </div>
-              <div className="flex flex-col gap-2 mb-6">
+              <div className="flex flex-col gap-2 mb-6 w-full max-w-[200px]">
                 <button onClick={() => fileInputRef.current?.click()} className="px-6 py-2 bg-asis-bg text-asis-text font-black rounded-xl border border-asis-border text-xs hover:bg-asis-primary">Tukar Foto</button>
                 <button onClick={handleGenerateAvatar} disabled={isGeneratingAvatar} className="px-6 py-2 bg-asis-text text-asis-bg font-black rounded-xl border border-asis-text text-xs hover:bg-asis-primary hover:text-asis-text disabled:opacity-50">{isGeneratingAvatar ? 'Menjana...' : 'Jana Avatar AI'}</button>
               </div>
               <h2 className="text-3xl font-black leading-tight">{student.firstName} {student.lastName}</h2>
               <p className="font-black text-lg tracking-wide uppercase mt-3" style={{ color: houseColor }}>{student.house} • {student.grade} {student.classGroup.split(' ')[1]}</p>
-              <div className="bg-asis-bg/30 p-8 rounded-3xl mt-10">
+              <div className="bg-asis-bg/30 p-8 rounded-3xl mt-10 w-full">
                 <p className="text-xs opacity-40 font-black uppercase tracking-[0.2em] mb-2">{t('sd_total_merit')}</p>
                 <p className={`text-6xl font-black ${student.totalPoints >= 100 ? 'text-emerald-500' : 'text-rose-500'}`}>{student.totalPoints}</p>
               </div>
