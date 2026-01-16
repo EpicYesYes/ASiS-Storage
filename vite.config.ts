@@ -5,15 +5,22 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Safely inject the API key for the Gemini service
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY || '')
+    // Defines global constants to be replaced during build
+    'process.env.API_KEY': JSON.stringify(process.env.API_KEY || ''),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
   },
   build: {
     outDir: 'dist',
     target: 'esnext',
-    sourcemap: false
+    sourcemap: false,
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
   },
   server: {
-    port: 3000
+    port: 3000,
+    host: true
   }
 });
