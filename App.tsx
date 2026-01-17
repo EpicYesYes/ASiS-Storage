@@ -54,8 +54,6 @@ const App: React.FC = () => {
   const performCloudPush = useCallback(async (currentStudents: Student[], currentTeachers: TeacherProfile[], currentCases: DisciplinaryCase[], currentColors: Record<number, string>) => {
     setIsSyncing(true);
     setSyncStatusMsg("Menghantar...");
-    
-    // Simulation of network delay
     await new Promise(r => setTimeout(r, 800));
 
     const data = { 
@@ -67,6 +65,7 @@ const App: React.FC = () => {
       pushedBy: currentUser?.name || 'Sistem'
     };
     
+    // Simulation of global storage
     localStorage.setItem('ASIS_GLOBAL_CLOUD_STORAGE', JSON.stringify(data));
     setLastSync(Date.now());
     setIsSyncing(false);
@@ -76,19 +75,20 @@ const App: React.FC = () => {
 
   const handleCloudPull = async () => {
     setIsSyncing(true);
+    setSyncStatusMsg("Menarik...");
     await new Promise(r => setTimeout(r, 1200));
 
     const cloudDataRaw = localStorage.getItem('ASIS_GLOBAL_CLOUD_STORAGE');
     if (cloudDataRaw) {
       const cloudData = JSON.parse(cloudDataRaw);
-      setStudents(cloudData.students);
-      setTeachers(cloudData.teachers);
-      setCases(cloudData.cases);
-      setBatchColors(cloudData.batchColors);
+      setStudents(cloudData.students || []);
+      setTeachers(cloudData.teachers || []);
+      setCases(cloudData.cases || []);
+      setBatchColors(cloudData.batchColors || INITIAL_BATCH_COLORS);
       setLastSync(cloudData.timestamp);
-      setSyncStatusMsg("Data Ditarik");
+      setSyncStatusMsg("Sinkronisasi Selesai");
     } else {
-      setSyncStatusMsg("Tiada Data");
+      setSyncStatusMsg("Tiada Data Awan");
     }
     setIsSyncing(false);
     setTimeout(() => setSyncStatusMsg(null), 2000);
@@ -132,7 +132,6 @@ const App: React.FC = () => {
     }
   }, [students, teachers, cases, batchColors, currentUser, schoolPassword, language, isLoaded, lastSync]);
 
-  // Data Action Handlers with Auto-Sync
   const handleUpdateStudent = (id: string, record: Omit<StudentRecord, 'id' | 'timestamp' | 'teacherName'>) => {
     if (!currentUser) return;
     const newRec = { ...record, id: `rec-${Date.now()}-${Math.random()}`, timestamp: Date.now(), teacherName: currentUser.name };
@@ -214,7 +213,7 @@ const App: React.FC = () => {
         <header className="sticky top-0 z-30 bg-asis-bg/80 backdrop-blur-md border-b border-asis-border px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
              <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"/></svg></button>
-             <h1 className="text-xl font-black capitalize tracking-tight">{activeView.replace('-', ' ')}</h1>
+             <h1 className="text-xl font-black capitalize tracking-tight">{t(activeView === 'student-detail' ? 'sd_title' : `nav_${activeView}` as any)}</h1>
           </div>
           <div className="flex items-center gap-4">
             {syncStatusMsg && (
@@ -223,12 +222,7 @@ const App: React.FC = () => {
                 <span className="text-[10px] font-black uppercase tracking-widest">{syncStatusMsg}</span>
               </div>
             )}
-            <button 
-              onClick={handleCloudPull}
-              disabled={isSyncing}
-              className={`p-2.5 rounded-xl border border-asis-border bg-asis-card shadow-sm transition-all hover:bg-asis-primary group ${isSyncing ? 'animate-spin' : 'hover:scale-105 active:scale-95'}`}
-              title="Tarik Data Terkini (Manual Pull)"
-            >
+            <button onClick={handleCloudPull} disabled={isSyncing} className={`p-2.5 rounded-xl border border-asis-border bg-asis-card shadow-sm transition-all hover:bg-asis-primary group ${isSyncing ? 'animate-spin' : 'hover:scale-105 active:scale-95'}`} title="Tarik Data Terkini (Manual Pull)">
               <svg className="w-5 h-5 group-hover:text-[#0000bf]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             </button>
             <button onClick={() => setActiveView('account')} className="w-10 h-10 rounded-xl bg-asis-primary flex items-center justify-center text-asis-text font-black shadow-md overflow-hidden hover:scale-105 transition-transform">{currentUser.name[0]}</button>
@@ -242,9 +236,7 @@ const App: React.FC = () => {
             <AdminPortal 
               students={students} batchColors={batchColors} teacher={currentUser} allTeachers={teachers} schoolPassword={schoolPassword} onUpdateSchoolPassword={setSchoolPassword}
               onSelectStudent={id => { setSelectedStudentId(id); setActiveView('student-detail'); }}
-              onUpdateTeacher={handleUpdateTeacher}
-              onAddTeacher={handleAddTeacher} 
-              onRemoveTeacher={handleRemoveTeacher}
+              onUpdateTeacher={handleUpdateTeacher} onAddTeacher={handleAddTeacher} onRemoveTeacher={handleRemoveTeacher}
               onAddStudent={handleAddStudent} onRemoveStudent={handleRemoveStudent}
               onBulkReassign={r => { const updated = students.map(s => r[s.id] ? { ...s, ...r[s.id] } : s); setStudents(updated); performCloudPush(updated, teachers, cases, batchColors); }}
               onUpdateColors={c => { setBatchColors(c); performCloudPush(students, teachers, cases, c); }} 

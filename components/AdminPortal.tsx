@@ -60,7 +60,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
   });
 
   const [showAddTeacher, setShowAddTeacher] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState<TeacherProfile | null>(null);
+  const [editingTeacherId, setEditingTeacherId] = useState<string | null>(null);
   const [newTeacherAccount, setNewTeacherAccount] = useState<{ id: string; pass: string } | null>(null);
   
   const [teacherForm, setTeacherForm] = useState({
@@ -74,6 +74,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
     department: 'Akademik', 
     isAdmin: false
   });
+
+  const [syncTokenInput, setSyncTokenInput] = useState('');
 
   const filteredStudents = useMemo(() => {
     if (!studentSearchQuery) return students.slice(0, 10);
@@ -131,17 +133,20 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
     const sepStr = teacherForm.separator === '(none)' ? '' : ` ${teacherForm.separator} `;
     const fullName = `${teacherForm.title} ${teacherForm.firstName}${sepStr}${teacherForm.lastName}`.trim();
 
-    if (editingTeacher) {
-      onUpdateTeacher({
-        ...editingTeacher,
-        name: fullName,
-        roles: teacherForm.roles,
-        subjects: teacherForm.subjects,
-        email: teacherForm.email,
-        department: teacherForm.department,
-        isAdmin: teacherForm.isAdmin
-      });
-      setEditingTeacher(null);
+    if (editingTeacherId) {
+      const existing = allTeachers.find(t => t.id === editingTeacherId);
+      if (existing) {
+        onUpdateTeacher({
+          ...existing,
+          name: fullName,
+          roles: teacherForm.roles,
+          subjects: teacherForm.subjects,
+          email: teacherForm.email,
+          department: teacherForm.department,
+          isAdmin: teacherForm.isAdmin
+        });
+      }
+      setEditingTeacherId(null);
     } else {
       const id = `GURU-${Math.floor(1000 + Math.random() * 9000)}`;
       const pass = Math.random().toString(36).slice(-8);
@@ -158,7 +163,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
   };
 
   const handleEditTeacher = (t: TeacherProfile) => {
-    // Basic heuristic to reverse-parse the name parts for the form
+    // Attempting to reverse parse name parts
     const parts = t.name.split(' ');
     setTeacherForm({
       title: TEACHER_TITLES.includes(parts[0]) ? parts[0] : TEACHER_TITLES[0],
@@ -171,14 +176,33 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
       department: t.department,
       isAdmin: t.isAdmin
     });
-    setEditingTeacher(t);
+    setEditingTeacherId(t.id);
+  };
+
+  const exportSyncToken = () => {
+    const data = { students, teachers: allTeachers, batchColors, timestamp: Date.now() };
+    const token = btoa(JSON.stringify(data));
+    setSyncTokenInput(token);
+    navigator.clipboard.writeText(token);
+    alert("Token disalin ke papan keratan!");
+  };
+
+  const importSyncToken = () => {
+    try {
+      const data = JSON.parse(atob(syncTokenInput));
+      onImportBackup(data);
+      alert("Sinkronisasi berjaya!");
+      setSyncTokenInput('');
+    } catch (e) {
+      alert("Token tidak sah.");
+    }
   };
 
   const renderTeacherForm = (isNew: boolean) => (
     <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8 animate-in slide-in-from-top-4">
       <div className="flex items-center justify-between">
         <h3 className="text-2xl font-black">{isNew ? 'Daftar Guru Baharu' : `Kemas Kini Profil Guru`}</h3>
-        <button onClick={() => { setShowAddTeacher(false); setEditingTeacher(null); }} className="opacity-40 hover:opacity-100"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button onClick={() => { setShowAddTeacher(false); setEditingTeacherId(null); }} className="opacity-40 hover:opacity-100"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
       <form onSubmit={handleTeacherSubmit} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -250,7 +274,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Department</label>
-            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Akademik / HEM / Kokurikulum" value={teacherForm.department} onChange={e => setTeacherForm({...teacherForm, department: e.target.value})} />
+            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Akademik / HEM" value={teacherForm.department} onChange={e => setTeacherForm({...teacherForm, department: e.target.value})} />
           </div>
         </div>
 
@@ -263,7 +287,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-asis-border">
-          <button type="button" onClick={() => { setShowAddTeacher(false); setEditingTeacher(null); }} className="px-8 py-4 font-black opacity-40">Batal</button>
+          <button type="button" onClick={() => { setShowAddTeacher(false); setEditingTeacherId(null); }} className="px-8 py-4 font-black opacity-40">Batal</button>
           <button type="submit" className="px-10 py-4 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest">
             {isNew ? 'Daftar Guru' : 'Simpan Perubahan'}
           </button>
@@ -298,7 +322,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
       {/* Admin Header */}
       <div className="bg-asis-card p-8 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
-        <div><h2 className="text-3xl font-black tracking-tight">{t('adm_title')}</h2><p className="opacity-60 mt-1 font-black italic uppercase text-[10px] tracking-widest">Administrator: {teacher.name}</p></div>
+        <div><h2 className="text-3xl font-black tracking-tight">{t('adm_title')}</h2><p className="opacity-60 mt-1 font-black italic uppercase text-[10px] tracking-widest">Admin: {teacher.name}</p></div>
         <div className="flex bg-asis-bg/50 p-1.5 rounded-2xl border border-asis-border">
           {(['students', 'teachers', 'system'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-asis-primary shadow-sm' : 'opacity-40 hover:opacity-100'}`}>
@@ -311,7 +335,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
       {activeTab === 'teachers' && (
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
            {showAddTeacher && renderTeacherForm(true)}
-           {editingTeacher && renderTeacherForm(false)}
+           {editingTeacherId && renderTeacherForm(false)}
 
            {newTeacherAccount && (
              <div className="bg-emerald-500 p-10 rounded-[3rem] text-white shadow-xl space-y-4 animate-in zoom-in-95">
@@ -330,7 +354,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                <div><h3 className="text-2xl font-black">{t('adm_teacher_dir')}</h3><p className="text-xs opacity-40 font-black uppercase tracking-widest">Urus akses guru ke dalam sistem</p></div>
                <div className="flex gap-3">
                  <input type="text" placeholder="Cari guru..." className="md:w-64 bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-3 font-black outline-none focus:border-asis-primary" value={teacherSearchQuery} onChange={e => setTeacherSearchQuery(e.target.value)} />
-                 <button onClick={() => setShowAddTeacher(true)} className="px-6 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-lg">Tambah Guru</button>
+                 <button onClick={() => { setEditingTeacherId(null); setShowAddTeacher(true); }} className="px-6 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-lg">Tambah Guru</button>
                </div>
              </div>
              <div className="space-y-4">
@@ -417,7 +441,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
            <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl">
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-               <div><h3 className="text-2xl font-black">{t('adm_tab_students')}</h3><p className="text-xs opacity-40 font-black uppercase tracking-widest">Kemas kini profil atau padam rekod</p></div>
+               <div><h3 className="text-2xl font-black">{t('adm_tab_students')}</h3><p className="text-xs opacity-40 font-black uppercase tracking-widest">Urus data dan profil murid</p></div>
                <div className="flex gap-3">
                  <input type="text" placeholder="Cari murid..." className="md:w-64 bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-3 font-black outline-none focus:border-asis-primary" value={studentSearchQuery} onChange={e => setStudentSearchQuery(e.target.value)} />
                  <button onClick={() => setShowAddStudent(true)} className="px-6 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-lg">Tambah Baru</button>
@@ -431,7 +455,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                       <div><p className="font-black text-lg">{s.firstName} {s.lastName}</p><p className="text-[10px] opacity-40 uppercase font-black tracking-widest">F{s.grade} {s.classGroup.split(' ')[1]} • {s.house}</p></div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => onSelectStudent(s.id)} className="px-5 py-2.5 bg-asis-primary !text-[#0000bf] text-[10px] font-black uppercase rounded-xl">Edit</button>
+                      <button onClick={() => onSelectStudent(s.id)} className="px-5 py-2.5 bg-asis-primary !text-[#0000bf] text-[10px] font-black uppercase rounded-xl">Profil</button>
                       <button onClick={() => startVerification(() => onRemoveStudent(s.id), "Padam Murid", `Padam rekod ${s.firstName} secara kekal?`)} className="p-2.5 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                     </div>
                  </div>
@@ -443,62 +467,36 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
       {activeTab === 'system' && (
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
-           {/* System configuration... */}
+           {/* New Sync Token Feature */}
            <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-black flex items-center gap-4">
                     <div className="w-3 h-10 bg-emerald-500 rounded-full"></div>
-                    Auto-Sync Aktif
+                    Sinkronisasi Multi-Peranti
                   </h3>
-                  <p className="opacity-60 text-sm font-medium italic">Sistem akan menolak (Push) data secara automatik setiap kali perubahan dibuat.</p>
+                  <p className="opacity-60 text-sm font-medium italic">Gunakan Token Sinkronisasi untuk memindahkan data murid dan guru anda ke peranti lain.</p>
                 </div>
-                {lastSync > 0 && (
-                  <div className="text-right">
-                    <p className="text-[10px] font-black opacity-30 uppercase tracking-widest">Kemas kini Terakhir</p>
-                    <p className="text-xs font-black">{new Date(lastSync).toLocaleString()}</p>
-                  </div>
-                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button 
-                  onClick={onCloudPush}
-                  disabled={isSyncing}
-                  className="group relative overflow-hidden p-8 bg-asis-primary rounded-[2rem] shadow-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-14 h-14 bg-white/30 rounded-2xl flex items-center justify-center text-[#0000bf]">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-black text-[#0000bf] uppercase tracking-widest">Paksa Tolak (Push)</p>
-                      <p className="text-xs text-[#0000bf]/60 font-medium">Hantar manual data sekarang.</p>
-                    </div>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={onCloudPull}
-                  disabled={isSyncing}
-                  className="group relative overflow-hidden p-8 bg-asis-text rounded-[2rem] shadow-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-white">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-black text-white uppercase tracking-widest">Tarik Perubahan (Pull)</p>
-                      <p className="text-xs text-white/40 font-medium">Kemas kini data dari guru lain.</p>
-                    </div>
-                  </div>
-                </button>
+              <div className="space-y-4">
+                <label className="text-[10px] font-black opacity-40 uppercase tracking-widest block ml-1">{t('sync_token_label')}</label>
+                <textarea 
+                  className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-mono text-xs outline-none focus:border-asis-primary h-32"
+                  placeholder={t('sync_token_placeholder')}
+                  value={syncTokenInput}
+                  onChange={(e) => setSyncTokenInput(e.target.value)}
+                ></textarea>
+                <div className="flex gap-4">
+                  <button onClick={exportSyncToken} className="flex-1 py-4 bg-asis-text text-white font-black rounded-2xl shadow-xl uppercase text-[10px] tracking-widest">Salin Token (Export)</button>
+                  <button onClick={importSyncToken} className="flex-1 py-4 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase text-[10px] tracking-widest">Muat Token (Import)</button>
+                </div>
               </div>
            </div>
 
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
              <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8">
-               <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-asis-primary rounded-full"></div>Warna Kategori (Form)</h3>
+               <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-asis-primary rounded-full"></div>Warna Kategori (Tingkatan)</h3>
                <div className="grid grid-cols-2 gap-4">
                  {GRADES.map(g => (
                    <div key={g} className="flex items-center justify-between p-4 bg-asis-bg/20 rounded-2xl border border-asis-border">
@@ -509,8 +507,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                </div>
              </div>
              <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8">
-               <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-rose-500 rounded-full"></div>Bahaya & Pembersihan</h3>
-               <button onClick={() => startVerification(onClearAll, "Padam Semua Murid", "Hapus SEMUA rekod murid dari pangkalan data?")} className="w-full py-4 bg-rose-600 !text-white font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest">Kosongkan Database</button>
+               <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-rose-500 rounded-full"></div>Zon Bahaya</h3>
+               <button onClick={() => startVerification(onClearAll, "Padam Semua Murid", "Hapus SEMUA rekod murid dari pangkalan data peranti ini?")} className="w-full py-4 bg-rose-600 !text-white font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest">Kosongkan Database</button>
              </div>
            </div>
         </div>

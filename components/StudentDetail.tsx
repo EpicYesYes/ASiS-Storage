@@ -113,14 +113,14 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-1 space-y-8">
-          <div className="bg-asis-card p-10 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col items-center relative overflow-hidden text-center">
+          <div className="bg-asis-card p-10 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col items-center justify-center relative overflow-hidden text-center min-h-[500px]">
             <div className="absolute top-0 left-0 w-full h-40 opacity-10" style={{ backgroundColor: houseColor }}></div>
-            <div className="relative z-10 w-full flex flex-col items-center">
-              <div className="relative group w-64 h-64 mb-8 flex items-center justify-center bg-asis-bg/20 rounded-[2rem] overflow-hidden">
+            <div className="relative z-10 w-full flex flex-col items-center justify-center">
+              <div className="relative group w-64 h-64 mb-8 flex items-center justify-center bg-asis-bg/20 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-asis-card">
                 <img 
                   src={student.avatar} 
                   alt={student.firstName} 
-                  className="w-full h-full object-cover shadow-2xl border-8 border-asis-card cursor-pointer" 
+                  className="w-full h-full object-cover cursor-pointer" 
                   onClick={() => fileInputRef.current?.click()} 
                 />
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => {
@@ -130,7 +130,7 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
               </div>
               <div className="flex flex-col gap-2 mb-6 w-full max-w-[200px]">
                 <button onClick={() => fileInputRef.current?.click()} className="px-6 py-2 bg-asis-bg text-asis-text font-black rounded-xl border border-asis-border text-xs hover:bg-asis-primary">Tukar Foto</button>
-                <button onClick={handleGenerateAvatar} disabled={isGeneratingAvatar} className="px-6 py-2 bg-asis-text text-asis-bg font-black rounded-xl border border-asis-text text-xs hover:bg-asis-primary hover:text-asis-text disabled:opacity-50">{isGeneratingAvatar ? 'Menjana...' : 'Jana Avatar AI'}</button>
+                <button onClick={handleGenerateAvatar} disabled={isGeneratingAvatar} className="px-6 py-2 bg-asis-text text-asis-bg font-black rounded-xl border border-asis-text text-xs hover:bg-asis-primary hover:text-asis-text disabled:opacity-50">{isGeneratingAvatar ? 'Menjana...' : 'AI Avatar'}</button>
               </div>
               <h2 className="text-3xl font-black leading-tight">{student.firstName} {student.lastName}</h2>
               <p className="font-black text-lg tracking-wide uppercase mt-3" style={{ color: houseColor }}>{student.house} • {student.grade} {student.classGroup.split(' ')[1]}</p>
