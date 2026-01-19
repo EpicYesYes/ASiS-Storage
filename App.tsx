@@ -66,10 +66,16 @@ const App: React.FC = () => {
     };
     
     // Simulation of global storage
-    localStorage.setItem('ASIS_GLOBAL_CLOUD_STORAGE', JSON.stringify(data));
-    setLastSync(Date.now());
+    try {
+      localStorage.setItem('ASIS_GLOBAL_CLOUD_STORAGE', JSON.stringify(data));
+      setLastSync(Date.now());
+      setSyncStatusMsg("Berjaya");
+    } catch (e) {
+      console.warn("Could not sync to cloud: Storage full.");
+      setSyncStatusMsg("Gagal (Quota)");
+    }
+    
     setIsSyncing(false);
-    setSyncStatusMsg("Berjaya");
     setTimeout(() => setSyncStatusMsg(null), 2000);
   }, [currentUser]);
 
@@ -118,17 +124,21 @@ const App: React.FC = () => {
     setIsLoaded(true);
   }, []);
 
-  // Local persistence (backup)
+  // Local persistence (backup) - WRAPPED IN TRY CATCH to handle large images
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('asis_students', JSON.stringify(students));
-      localStorage.setItem('asis_teachers', JSON.stringify(teachers));
-      localStorage.setItem('asis_cases', JSON.stringify(cases));
-      localStorage.setItem('asis_batch_colors', JSON.stringify(batchColors));
-      localStorage.setItem('asis_school_password', schoolPassword);
-      localStorage.setItem('asis_lang', language);
-      localStorage.setItem('asis_last_sync', lastSync.toString());
-      if (currentUser) localStorage.setItem('asis_current_user', JSON.stringify(currentUser));
+      try {
+        localStorage.setItem('asis_students', JSON.stringify(students));
+        localStorage.setItem('asis_teachers', JSON.stringify(teachers));
+        localStorage.setItem('asis_cases', JSON.stringify(cases));
+        localStorage.setItem('asis_batch_colors', JSON.stringify(batchColors));
+        localStorage.setItem('asis_school_password', schoolPassword);
+        localStorage.setItem('asis_lang', language);
+        localStorage.setItem('asis_last_sync', lastSync.toString());
+        if (currentUser) localStorage.setItem('asis_current_user', JSON.stringify(currentUser));
+      } catch (e) {
+        console.error("Local storage quota exceeded. Changes might not be saved.", e);
+      }
     }
   }, [students, teachers, cases, batchColors, currentUser, schoolPassword, language, isLoaded, lastSync]);
 
