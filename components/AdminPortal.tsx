@@ -61,7 +61,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const [showAddTeacher, setShowAddTeacher] = useState(false);
   const [editingTeacherId, setEditingTeacherId] = useState<string | null>(null);
-  const [newTeacherAccount, setNewTeacherAccount] = useState<{ id: string; pass: string } | null>(null);
   
   const [teacherForm, setTeacherForm] = useState({
     title: TEACHER_TITLES[0],
@@ -71,7 +70,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
     roles: [TEACHER_ROLES[TEACHER_ROLES.length - 1]], 
     subjects: [] as string[],
     email: '', 
-    department: 'Akademik', 
+    staffId: '', 
+    password: '',
     isAdmin: false
   });
 
@@ -142,24 +142,32 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
           roles: teacherForm.roles,
           subjects: teacherForm.subjects,
           email: teacherForm.email,
-          department: teacherForm.department,
+          staffId: teacherForm.staffId,
+          password: teacherForm.password || existing.password,
           isAdmin: teacherForm.isAdmin
         });
       }
       setEditingTeacherId(null);
     } else {
       const id = `GURU-${Math.floor(1000 + Math.random() * 9000)}`;
-      const pass = Math.random().toString(36).slice(-8);
       onAddTeacher({
-        id, staffId: id, name: fullName, roles: teacherForm.roles, email: teacherForm.email,
-        department: teacherForm.department, meritsGiven: 0, demeritsGiven: 0, avatar: '',
-        subjects: teacherForm.subjects, isAdmin: teacherForm.isAdmin, password: pass
+        id: teacherForm.staffId || id, 
+        staffId: teacherForm.staffId || id, 
+        name: fullName, 
+        roles: teacherForm.roles, 
+        email: teacherForm.email,
+        department: 'Pentadbiran', 
+        meritsGiven: 0, 
+        demeritsGiven: 0, 
+        avatar: '',
+        subjects: teacherForm.subjects, 
+        isAdmin: teacherForm.isAdmin, 
+        password: teacherForm.password || 'password123'
       });
-      setNewTeacherAccount({ id, pass });
       setShowAddTeacher(false);
     }
     
-    setTeacherForm({ title: TEACHER_TITLES[0], firstName: '', separator: TEACHER_SEPARATORS[0], lastName: '', roles: [TEACHER_ROLES[TEACHER_ROLES.length - 1]], subjects: [], email: '', department: 'Akademik', isAdmin: false });
+    setTeacherForm({ title: TEACHER_TITLES[0], firstName: '', separator: TEACHER_SEPARATORS[0], lastName: '', roles: [TEACHER_ROLES[TEACHER_ROLES.length - 1]], subjects: [], email: '', staffId: '', password: '', isAdmin: false });
   };
 
   const handleEditTeacher = (tProfile: TeacherProfile) => {
@@ -172,7 +180,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
       roles: tProfile.roles,
       subjects: tProfile.subjects,
       email: tProfile.email,
-      department: tProfile.department,
+      staffId: tProfile.staffId,
+      password: tProfile.password || '',
       isAdmin: tProfile.isAdmin
     });
     setEditingTeacherId(tProfile.id);
@@ -186,7 +195,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
       reassignments[s.id] = { grade: newGrade, classGroup: `${newGrade} ${classPart}` };
     });
     onBulkReassign(reassignments);
-    alert("Kenaikan tingkatan berjaya untuk semua murid.");
   };
 
   const exportSyncToken = () => {
@@ -277,30 +285,35 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-1">
             <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">E-mel</label>
             <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="guru@asis.edu.my" type="email" value={teacherForm.email} onChange={e => setTeacherForm({...teacherForm, email: e.target.value})} required />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Jabatan</label>
-            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Akademik / HEM" value={teacherForm.department} onChange={e => setTeacherForm({...teacherForm, department: e.target.value})} />
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">ID Staf / Username</label>
+            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="cth: GURU-9901" value={teacherForm.staffId} onChange={e => setTeacherForm({...teacherForm, staffId: e.target.value})} required />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Kata Laluan</label>
+            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="••••••••" type="password" value={teacherForm.password} onChange={e => setTeacherForm({...teacherForm, password: e.target.value})} required={isNew} />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-3 cursor-pointer group">
+          <div className="flex items-center gap-3 cursor-pointer group no-hover-gold">
             <input 
               type="checkbox" 
+              id="adminCheckbox"
               className="sr-only peer" 
               checked={teacherForm.isAdmin} 
               onChange={e => setTeacherForm(prev => ({ ...prev, isAdmin: e.target.checked }))} 
             />
-            <div className="w-6 h-6 border-2 border-asis-border rounded-lg bg-asis-bg/30 peer-checked:bg-asis-primary peer-checked:border-asis-primary transition-all flex items-center justify-center">
+            <label htmlFor="adminCheckbox" className="w-6 h-6 border-2 border-asis-border rounded-lg bg-asis-bg/30 peer-checked:bg-asis-primary peer-checked:border-asis-primary transition-all flex items-center justify-center cursor-pointer">
               <svg className="w-4 h-4 text-[#0000bf] opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
-            </div>
-            <span className="text-xs font-black uppercase tracking-widest opacity-60">Berikan Akses Admin</span>
-          </label>
+            </label>
+            <label htmlFor="adminCheckbox" className="text-xs font-black uppercase tracking-widest opacity-60 cursor-pointer">Berikan Akses Admin</label>
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-asis-border">
@@ -371,6 +384,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                         <div className="flex flex-wrap gap-2 mt-1">
                           {tProfile.roles.map(r => <span key={r} className="text-[8px] font-black uppercase tracking-widest bg-asis-primary/20 px-2 py-0.5 rounded-md">{r}</span>)}
                           {tProfile.isAdmin && <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-600 px-2 py-0.5 rounded-md">Admin</span>}
+                          <span className="text-[8px] font-black uppercase tracking-widest bg-asis-bg/50 px-2 py-0.5 rounded-md opacity-40">@{tProfile.staffId}</span>
                         </div>
                       </div>
                     </div>
