@@ -162,21 +162,31 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
     setTeacherForm({ title: TEACHER_TITLES[0], firstName: '', separator: TEACHER_SEPARATORS[0], lastName: '', roles: [TEACHER_ROLES[TEACHER_ROLES.length - 1]], subjects: [], email: '', department: 'Akademik', isAdmin: false });
   };
 
-  const handleEditTeacher = (t: TeacherProfile) => {
-    // Attempting to reverse parse name parts
-    const parts = t.name.split(' ');
+  const handleEditTeacher = (tProfile: TeacherProfile) => {
+    const parts = tProfile.name.split(' ');
     setTeacherForm({
       title: TEACHER_TITLES.includes(parts[0]) ? parts[0] : TEACHER_TITLES[0],
       firstName: parts[1] || '',
       separator: parts.find(p => TEACHER_SEPARATORS.includes(p)) || '(none)',
       lastName: parts.slice(2).join(' ') || '',
-      roles: t.roles,
-      subjects: t.subjects,
-      email: t.email,
-      department: t.department,
-      isAdmin: t.isAdmin
+      roles: tProfile.roles,
+      subjects: tProfile.subjects,
+      email: tProfile.email,
+      department: tProfile.department,
+      isAdmin: tProfile.isAdmin
     });
-    setEditingTeacherId(t.id);
+    setEditingTeacherId(tProfile.id);
+  };
+
+  const handleFormPromotion = () => {
+    const reassignments: Record<string, { grade: number; classGroup: string }> = {};
+    students.forEach(s => {
+      const newGrade = s.grade + 1;
+      const classPart = s.classGroup.split(' ')[1];
+      reassignments[s.id] = { grade: newGrade, classGroup: `${newGrade} ${classPart}` };
+    });
+    onBulkReassign(reassignments);
+    alert("Kenaikan tingkatan berjaya untuk semua murid.");
   };
 
   const exportSyncToken = () => {
@@ -207,29 +217,29 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
       <form onSubmit={handleTeacherSubmit} className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Gelaran (Title)</label>
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Gelaran</label>
             <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" value={teacherForm.title} onChange={e => setTeacherForm({...teacherForm, title: e.target.value})}>
               {TEACHER_TITLES.map(tit => <option key={tit} value={tit}>{tit}</option>)}
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">First Name</label>
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Nama Pertama</label>
             <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Nama Pertama" value={teacherForm.firstName} onChange={e => setTeacherForm({...teacherForm, firstName: e.target.value})} required />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Separator</label>
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Pemisah</label>
             <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" value={teacherForm.separator} onChange={e => setTeacherForm({...teacherForm, separator: e.target.value})}>
               {TEACHER_SEPARATORS.map(sep => <option key={sep} value={sep}>{sep}</option>)}
             </select>
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Last Name</label>
-            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Nama Bapa/Keluarga" value={teacherForm.lastName} onChange={e => setTeacherForm({...teacherForm, lastName: e.target.value})} required />
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Nama Akhir</label>
+            <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Nama Akhir" value={teacherForm.lastName} onChange={e => setTeacherForm({...teacherForm, lastName: e.target.value})} required />
           </div>
         </div>
 
         <div className="space-y-4">
-          <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1 block">Teacher Position (Multi-select)</label>
+          <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1 block">Jawatan Guru (Pilih Banyak)</label>
           <div className="flex flex-wrap gap-2">
             {TEACHER_ROLES.map(role => (
               <button 
@@ -245,7 +255,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
         </div>
 
         <div className="space-y-4">
-          <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1 block">Subject Teaching (Multi-select)</label>
+          <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1 block">Subjek Mengajar (Pilih Banyak)</label>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Object.entries(SUBJECT_CATEGORIES).map(([cat, subs]) => (
               <div key={cat} className="space-y-2">
@@ -269,19 +279,26 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">E-mail Address</label>
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">E-mel</label>
             <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="guru@asis.edu.my" type="email" value={teacherForm.email} onChange={e => setTeacherForm({...teacherForm, email: e.target.value})} required />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Department</label>
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Jabatan</label>
             <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder="Akademik / HEM" value={teacherForm.department} onChange={e => setTeacherForm({...teacherForm, department: e.target.value})} />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-3 cursor-pointer group">
-            <input type="checkbox" className="sr-only peer" checked={teacherForm.isAdmin} onChange={e => setTeacherForm({...teacherForm, isAdmin: e.target.checked})} />
-            <div className="w-6 h-6 border-2 border-asis-border rounded-lg bg-asis-bg/30 peer-checked:bg-asis-primary peer-checked:border-asis-primary transition-all"></div>
+            <input 
+              type="checkbox" 
+              className="sr-only peer" 
+              checked={teacherForm.isAdmin} 
+              onChange={e => setTeacherForm(prev => ({ ...prev, isAdmin: e.target.checked }))} 
+            />
+            <div className="w-6 h-6 border-2 border-asis-border rounded-lg bg-asis-bg/30 peer-checked:bg-asis-primary peer-checked:border-asis-primary transition-all flex items-center justify-center">
+              <svg className="w-4 h-4 text-[#0000bf] opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+            </div>
             <span className="text-xs font-black uppercase tracking-widest opacity-60">Berikan Akses Admin</span>
           </label>
         </div>
@@ -298,7 +315,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-20 text-asis-text transition-colors duration-300">
-      {/* Verification Modal */}
       {verificationModal.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-asis-card rounded-[3rem] shadow-2xl max-w-md w-full p-10 text-center border-t-8 border-rose-600 border border-asis-border">
@@ -306,23 +322,22 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
             <p className="opacity-60 font-medium leading-relaxed mb-8">{verificationModal.message}</p>
             {verificationModal.stage === 'password' && (
               <div className="mb-8 text-left">
-                <label className="text-[10px] font-black opacity-40 uppercase tracking-widest block mb-2">School Admin Password</label>
+                <label className="text-[10px] font-black opacity-40 uppercase tracking-widest block mb-2">Kata Laluan Pentadbir Sekolah</label>
                 <input type="password" placeholder="••••••••" className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black outline-none focus:border-rose-600 text-center tracking-widest" value={verificationPassword} onChange={e => setVerificationPassword(e.target.value)} autoFocus />
               </div>
             )}
             <div className="flex flex-col gap-3">
               <button onClick={handleVerificationProceed} className="w-full py-5 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase tracking-widest text-xs">
-                {verificationModal.stage === 'confirm' ? 'Confirm Action' : 'Authorize Action'}
+                {verificationModal.stage === 'confirm' ? 'Sahkan Tindakan' : 'Sahkan Akses'}
               </button>
-              <button onClick={() => setVerificationModal(prev => ({ ...prev, show: false }))} className="w-full py-4 bg-asis-bg text-asis-text font-black rounded-2xl hover:opacity-80 transition-all uppercase tracking-widest text-[10px]">Cancel</button>
+              <button onClick={() => setVerificationModal(prev => ({ ...prev, show: false }))} className="w-full py-4 bg-asis-bg text-asis-text font-black rounded-2xl hover:opacity-80 transition-all uppercase tracking-widest text-[10px]">Batal</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Admin Header */}
       <div className="bg-asis-card p-8 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
-        <div><h2 className="text-3xl font-black tracking-tight">{t('adm_title')}</h2><p className="opacity-60 mt-1 font-black italic uppercase text-[10px] tracking-widest">Admin: {teacher.name}</p></div>
+        <div><h2 className="text-3xl font-black tracking-tight">{t('adm_title')}</h2><p className="opacity-60 mt-1 font-black italic uppercase text-[10px] tracking-widest">Pusat Kawalan Pentadbir</p></div>
         <div className="flex bg-asis-bg/50 p-1.5 rounded-2xl border border-asis-border">
           {(['students', 'teachers', 'system'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-asis-primary shadow-sm' : 'opacity-40 hover:opacity-100'}`}>
@@ -336,19 +351,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
            {showAddTeacher && renderTeacherForm(true)}
            {editingTeacherId && renderTeacherForm(false)}
-
-           {newTeacherAccount && (
-             <div className="bg-emerald-500 p-10 rounded-[3rem] text-white shadow-xl space-y-4 animate-in zoom-in-95">
-               <h3 className="text-2xl font-black">Akaun Guru Berjaya Dicipta</h3>
-               <p className="font-bold opacity-80">Sila salin maklumat log masuk ini untuk guru tersebut:</p>
-               <div className="bg-black/20 p-6 rounded-2xl space-y-2 font-mono text-lg">
-                 <p>ID Staf: <span className="font-black text-white">{newTeacherAccount.id}</span></p>
-                 <p>K. Laluan: <span className="font-black text-white">{newTeacherAccount.pass}</span></p>
-               </div>
-               <button onClick={() => setNewTeacherAccount(null)} className="px-8 py-3 bg-white text-emerald-600 font-black rounded-xl uppercase text-xs">Tutup & Teruskan</button>
-             </div>
-           )}
-
            <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl">
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                <div><h3 className="text-2xl font-black">{t('adm_teacher_dir')}</h3><p className="text-xs opacity-40 font-black uppercase tracking-widest">Urus akses guru ke dalam sistem</p></div>
@@ -358,24 +360,24 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                </div>
              </div>
              <div className="space-y-4">
-               {filteredTeachers.map(t => (
-                 <div key={t.id} className="p-6 border-2 border-asis-border rounded-[2rem] flex items-center justify-between hover:bg-asis-bg/10 transition-colors group">
+               {filteredTeachers.map(tProfile => (
+                 <div key={tProfile.id} className="p-6 border-2 border-asis-border rounded-[2rem] flex items-center justify-between hover:bg-asis-bg/10 transition-colors group">
                     <div className="flex items-center gap-4">
                       <div className="w-14 h-14 bg-asis-bg rounded-2xl flex items-center justify-center font-black text-asis-text/30 text-xl overflow-hidden">
-                        {t.avatar ? <img src={t.avatar} className="w-full h-full object-cover" alt="" /> : t.name[0]}
+                        {tProfile.avatar ? <img src={tProfile.avatar} className="w-full h-full object-cover" alt="" /> : tProfile.name[0]}
                       </div>
                       <div>
-                        <p className="font-black text-lg">{t.name}</p>
+                        <p className="font-black text-lg">{tProfile.name}</p>
                         <div className="flex flex-wrap gap-2 mt-1">
-                          {t.roles.map(r => <span key={r} className="text-[8px] font-black uppercase tracking-widest bg-asis-primary/20 px-2 py-0.5 rounded-md">{r}</span>)}
-                          <span className="text-[8px] font-black uppercase tracking-widest opacity-30">• {t.staffId} • {t.department}</span>
+                          {tProfile.roles.map(r => <span key={r} className="text-[8px] font-black uppercase tracking-widest bg-asis-primary/20 px-2 py-0.5 rounded-md">{r}</span>)}
+                          {tProfile.isAdmin && <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-600 px-2 py-0.5 rounded-md">Admin</span>}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleEditTeacher(t)} className="px-4 py-2 bg-asis-bg text-asis-text border border-asis-border font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-asis-primary transition-all">Edit</button>
-                      {t.id !== teacher.id && (
-                        <button onClick={() => startVerification(() => onRemoveTeacher(t.id), "Padam Guru", `Hapus akses sistem untuk ${t.name}?`)} className="p-2.5 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                      <button onClick={() => handleEditTeacher(tProfile)} className="px-4 py-2 bg-asis-bg text-asis-text border border-asis-border font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-asis-primary transition-all">Edit</button>
+                      {tProfile.id !== teacher.id && (
+                        <button onClick={() => startVerification(() => onRemoveTeacher(tProfile.id), "Padam Guru", `Hapus akses sistem untuk ${tProfile.name}?`)} className="p-2.5 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                       )}
                     </div>
                  </div>
@@ -409,6 +411,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
                       <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">{t('adm_l_name')}</label>
                       <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" placeholder={t('adm_l_name')} value={newStudentForm.lastName} onChange={e => setNewStudentForm({...newStudentForm, lastName: e.target.value})} required />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-1">
                       <label className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">{t('adm_house')}</label>
                       <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black" value={newStudentForm.house} onChange={e => setNewStudentForm({...newStudentForm, house: e.target.value})}>
@@ -439,46 +443,60 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
              </div>
            )}
 
-           <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl">
-             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-               <div><h3 className="text-2xl font-black">{t('adm_tab_students')}</h3><p className="text-xs opacity-40 font-black uppercase tracking-widest">Urus data dan profil murid</p></div>
-               <div className="flex gap-3">
-                 <input type="text" placeholder="Cari murid..." className="md:w-64 bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-3 font-black outline-none focus:border-asis-primary" value={studentSearchQuery} onChange={e => setStudentSearchQuery(e.target.value)} />
-                 <button onClick={() => setShowAddStudent(true)} className="px-6 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-lg">Tambah Baru</button>
-               </div>
-             </div>
-             <div className="space-y-4">
-               {filteredStudents.map(s => (
-                 <div key={s.id} className="p-6 border-2 border-asis-border rounded-[2rem] flex items-center justify-between hover:bg-asis-bg/10 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <img src={s.avatar} className="w-14 h-14 rounded-2xl object-cover" alt="" />
-                      <div><p className="font-black text-lg">{s.firstName} {s.lastName}</p><p className="text-[10px] opacity-40 uppercase font-black tracking-widest">F{s.grade} {s.classGroup.split(' ')[1]} • {s.house}</p></div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => onSelectStudent(s.id)} className="px-5 py-2.5 bg-asis-primary !text-[#0000bf] text-[10px] font-black uppercase rounded-xl">Profil</button>
-                      <button onClick={() => startVerification(() => onRemoveStudent(s.id), "Padam Murid", `Padam rekod ${s.firstName} secara kekal?`)} className="p-2.5 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl">
+                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                   <div><h3 className="text-2xl font-black">{t('adm_tab_students')}</h3><p className="text-xs opacity-40 font-black uppercase tracking-widest">Pangkalan Data Murid</p></div>
+                   <button onClick={() => setShowAddStudent(true)} className="px-6 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-lg">Tambah Baru</button>
+                 </div>
+                 <div className="space-y-4">
+                   <input type="text" placeholder="Cari murid..." className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-3 font-black outline-none focus:border-asis-primary mb-4" value={studentSearchQuery} onChange={e => setStudentSearchQuery(e.target.value)} />
+                   {filteredStudents.map(s => (
+                     <div key={s.id} className="p-4 border-2 border-asis-border rounded-[2rem] flex items-center justify-between hover:bg-asis-bg/10 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <img src={s.avatar} className="w-12 h-12 rounded-2xl object-cover" alt="" />
+                          <div><p className="font-black text-sm">{s.firstName} {s.lastName}</p><p className="text-[9px] opacity-40 uppercase font-black tracking-widest">F{s.grade} • {s.classGroup}</p></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => onSelectStudent(s.id)} className="px-4 py-2 bg-asis-primary !text-[#0000bf] text-[9px] font-black uppercase rounded-xl">Profil</button>
+                          <button onClick={() => startVerification(() => onRemoveStudent(s.id), "Padam Murid", `Padam rekod ${s.firstName}?`)} className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                        </div>
+                     </div>
+                   ))}
+                 </div>
+              </div>
+
+              <div className="space-y-8">
+                 <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl">
+                    <h3 className="text-2xl font-black mb-6 flex items-center gap-4"><div className="w-2 h-8 bg-emerald-500 rounded-full"></div>{t('adm_bulk_tools')}</h3>
+                    <div className="space-y-4">
+                       <div className="p-6 bg-asis-bg/30 rounded-3xl border border-asis-border flex items-center justify-between gap-4">
+                          <div><h4 className="font-black text-lg">{t('adm_promotion')}</h4><p className="text-[10px] opacity-40 uppercase font-black tracking-widest">{t('adm_promotion_desc')}</p></div>
+                          <button onClick={() => startVerification(handleFormPromotion, "Promosi Murid", "Adakah anda pasti mahu menaikkan semua murid ke tingkatan seterusnya?")} className="px-6 py-3 bg-asis-text text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all">Laksanakan</button>
+                       </div>
+                       <div className="p-6 bg-asis-bg/30 rounded-3xl border border-asis-border flex items-center justify-between gap-4">
+                          <div><h4 className="font-black text-lg">{t('adm_add_batch')}</h4><p className="text-[10px] opacity-40 uppercase font-black tracking-widest">{t('adm_add_batch_desc')}</p></div>
+                          <button onClick={() => startVerification(() => onAddBatch(100), "Tambah Murid", "Jana 100 murid baharu (Tingkatan 1)?")} className="px-6 py-3 bg-asis-primary !text-[#0000bf] rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all">Jana Batch</button>
+                       </div>
                     </div>
                  </div>
-               ))}
-             </div>
+              </div>
            </div>
         </div>
       )}
 
       {activeTab === 'system' && (
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
-           {/* New Sync Token Feature */}
            <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-black flex items-center gap-4">
                     <div className="w-3 h-10 bg-emerald-500 rounded-full"></div>
-                    Sinkronisasi Multi-Peranti
+                    {t('sync_title')}
                   </h3>
-                  <p className="opacity-60 text-sm font-medium italic">Gunakan Token Sinkronisasi untuk memindahkan data murid dan guru anda ke peranti lain.</p>
+                  <p className="opacity-60 text-sm font-medium italic">{t('sync_desc')}</p>
                 </div>
               </div>
-
               <div className="space-y-4">
                 <label className="text-[10px] font-black opacity-40 uppercase tracking-widest block ml-1">{t('sync_token_label')}</label>
                 <textarea 
@@ -496,7 +514,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
 
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
              <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8">
-               <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-asis-primary rounded-full"></div>Warna Kategori (Tingkatan)</h3>
+               <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-asis-primary rounded-full"></div>Warna Tingkatan</h3>
                <div className="grid grid-cols-2 gap-4">
                  {GRADES.map(g => (
                    <div key={g} className="flex items-center justify-between p-4 bg-asis-bg/20 rounded-2xl border border-asis-border">
@@ -508,7 +526,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({
              </div>
              <div className="bg-asis-card p-10 rounded-[3rem] border border-asis-border shadow-xl space-y-8">
                <h3 className="text-2xl font-black flex items-center gap-3"><div className="w-2 h-8 bg-rose-500 rounded-full"></div>Zon Bahaya</h3>
-               <button onClick={() => startVerification(onClearAll, "Padam Semua Murid", "Hapus SEMUA rekod murid dari pangkalan data peranti ini?")} className="w-full py-4 bg-rose-600 !text-white font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest">Kosongkan Database</button>
+               <button onClick={() => startVerification(onClearAll, "Padam Semua Murid", "Hapus SEMUA rekod murid dari pangkalan data peranti ini?")} className="w-full py-4 bg-rose-600 !text-white font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest">Kosongkan Pangkalan Data</button>
              </div>
            </div>
         </div>

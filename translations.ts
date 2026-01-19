@@ -58,6 +58,14 @@ export const translations = {
     dash_filter_class: "Kelas",
     dash_no_data: "Tiada data tersedia.",
     
+    // Student List
+    sl_search_placeholder: "Cari nama murid atau kelas...",
+    sl_all_houses: "Semua Rumah",
+    sl_select_all: "Pilih Semua",
+    sl_deselect_all: "Batal Pilihan",
+    sl_give_points: "Berikan Mata",
+    sl_no_students: "Tiada murid ditemui.",
+
     // Student Detail
     sd_title: "Profil Murid",
     sd_back_dir: "Kembali ke Direktori",
@@ -80,8 +88,6 @@ export const translations = {
     case_location: "Lokasi Kejadian",
     case_penalty: "Berikan Demerit",
     case_decision_sec: "Keputusan & Tindakan",
-    
-    // Case Categories
     case_cat_vandalism: "Vandalisme",
     case_cat_bullying: "Buli",
     case_cat_cyber: "Siber",
@@ -112,14 +118,38 @@ export const translations = {
     adm_sep: "Pemisah",
     adm_house: "Rumah Sukan",
     adm_teacher_dir: "Direktori Guru",
+    adm_bulk_tools: "Alatan Pukal",
     adm_promotion: "Kenaikan Tingkatan",
-    adm_promotion_desc: "Uruskan kenaikan tingkatan secara pukal.",
+    adm_promotion_desc: "Naikkan semua murid ke tingkatan seterusnya.",
+    adm_add_batch: "Tambah Batch F1",
+    adm_add_batch_desc: "Tambah 100 murid baharu secara rawak.",
+
+    // Account Page
+    acc_update_profile: "Kemas Kini Profil",
+    acc_subjects: "Mata Pelajaran Diajar",
+    acc_security: "Keselamatan & Kata Laluan",
+    acc_current_pass: "Kata Laluan Semasa",
+    acc_new_pass: "Kata Laluan Baharu",
+    acc_confirm_pass: "Sahkan Kata Laluan",
+    acc_update_pass: "Tukar Kata Laluan",
+    acc_contact_info: "Maklumat Hubungan",
+    acc_official_email: "E-mel Rasmi",
+    acc_department: "Jabatan/Unit",
+    acc_app_theme: "Tema Aplikasi",
+    acc_theme_light: "Mod Cerah",
+    acc_theme_dark: "Mod Gelap",
+    acc_theme_system: "Ikut Sistem",
+    acc_teacher_impact: "Impak Guru",
+    acc_display_lang: "Bahasa Paparan",
+    acc_logout: "Log Keluar",
+    acc_confirm_logout: "Sahkan Log Keluar",
+    acc_logout_desc: "Adakah anda pasti mahu keluar dari sistem?",
+    acc_yes_confirm: "Ya, Log Keluar",
 
     // Login
     login_remember_me: "Ingat Saya"
   },
   en: {
-    // General
     school_name: "Alam Shah Science School",
     system_status: "System Status",
     active_safe: "Active & Secure",
@@ -132,35 +162,25 @@ export const translations = {
     close: "Close",
     yes_confirm: "Yes, Confirm",
     confirm_delete_student: "Delete this student record?",
-
-    // Cloud Sync
     sync_title: "Sync Center",
-    sync_desc: "Move your data between devices using a Sync Token.",
+    sync_desc: "Move data via Sync Token.",
     sync_push: "Push Data",
     sync_pull: "Pull Data",
-    sync_token_label: "Sync Token (Copy/Paste)",
-    sync_token_placeholder: "Paste token here to load data...",
+    sync_token_label: "Sync Token",
+    sync_token_placeholder: "Paste token here...",
     sync_last: "Last updated",
-    
-    // Categories
     cat_akademik: "Academic",
     cat_koko: "Co-curricular",
     cat_sahsiah: "Personality",
     cat_3k: "3K",
     cat_demerit: "Demerit",
-
-    // Grades
     grade_prefix: "Form",
     grade_all: "All Forms",
-
-    // Sidebar
     nav_dashboard: "Dashboard",
     nav_students: "Students",
     nav_cases: "Disciplinary Cases",
     nav_admin: "Admin",
     nav_account: "Teacher Account",
-    
-    // Dashboard
     dash_enrolment: "Student Enrolment",
     dash_merit_total: "Total Merits",
     dash_demerit_total: "Total Demerits",
@@ -175,8 +195,12 @@ export const translations = {
     dash_filter_house: "House",
     dash_filter_class: "Class",
     dash_no_data: "No data available.",
-
-    // Student Detail
+    sl_search_placeholder: "Search name or class...",
+    sl_all_houses: "All Houses",
+    sl_select_all: "Select All",
+    sl_deselect_all: "Deselect All",
+    sl_give_points: "Give Points",
+    sl_no_students: "No students found.",
     sd_title: "Student Profile",
     sd_back_dir: "Back to Directory",
     sd_total_merit: "Total Merit Points",
@@ -188,18 +212,14 @@ export const translations = {
     sd_record_entry: "Record Entry",
     sd_timeline: "Timeline",
     sd_no_records: "No records.",
-
-    // Case Management
     case_room: "Disciplinary Ops Center",
-    case_desc: "School-wide monitoring of disciplinary cases.",
+    case_desc: "Monitoring of disciplinary cases.",
     case_reg: "Register Case",
     case_perps: "Perpetrators",
     case_victims: "Victims",
     case_location: "Incident Location",
     case_penalty: "Apply Demerit",
     case_decision_sec: "Decision & Actions",
-    
-    // Case Categories
     case_cat_vandalism: "Vandalism",
     case_cat_bullying: "Bullying",
     case_cat_cyber: "Cyber",
@@ -208,18 +228,12 @@ export const translations = {
     case_cat_drugs: "Vaping/Smoking/Drugs",
     case_cat_sexual: "Sexual Misconduct",
     case_cat_others: "Others",
-
-    // Severity
     sev_minor: "Minor",
     sev_major: "Major",
     sev_severe: "Severe",
-
-    // Status
     status_pending: "Pending",
     status_investigating: "Investigating",
     status_resolved: "Resolved",
-
-    // Admin
     adm_title: "Admin Portal",
     adm_tab_students: "Student Management",
     adm_tab_teachers: "Teacher Management",
@@ -230,10 +244,31 @@ export const translations = {
     adm_sep: "Separator",
     adm_house: "Sport House",
     adm_teacher_dir: "Teacher Directory",
+    adm_bulk_tools: "Bulk Tools",
     adm_promotion: "Form Promotion",
-    adm_promotion_desc: "Bulk manage form transitions.",
-
-    // Login
+    adm_promotion_desc: "Advance all students to next form.",
+    adm_add_batch: "Add F1 Batch",
+    adm_add_batch_desc: "Add 100 random new students.",
+    acc_update_profile: "Update Profile",
+    acc_subjects: "Subjects Taught",
+    acc_security: "Security & Password",
+    acc_current_pass: "Current Password",
+    acc_new_pass: "New Password",
+    acc_confirm_pass: "Confirm Password",
+    acc_update_pass: "Change Password",
+    acc_contact_info: "Contact Info",
+    acc_official_email: "Official Email",
+    acc_department: "Department",
+    acc_app_theme: "App Theme",
+    acc_theme_light: "Light Mode",
+    acc_theme_dark: "Dark Mode",
+    acc_theme_system: "System Default",
+    acc_teacher_impact: "Teacher Impact",
+    acc_display_lang: "Language",
+    acc_logout: "Logout",
+    acc_confirm_logout: "Confirm Logout",
+    acc_logout_desc: "Are you sure you want to logout?",
+    acc_yes_confirm: "Yes, Logout",
     login_remember_me: "Remember Me"
   }
 };
