@@ -1,7 +1,6 @@
 
 export const translations = {
   ms: {
-    // General
     school_name: "SM Sains Alam Shah",
     system_status: "Status Sistem",
     active_safe: "Aktif & Selamat",
@@ -14,35 +13,25 @@ export const translations = {
     close: "Tutup",
     yes_confirm: "Ya, Sahkan",
     confirm_delete_student: "Hapus rekod murid ini?",
-    
-    // Cloud Sync
-    sync_title: "Pusat Sinkronisasi",
-    sync_desc: "Pindahkan data anda antara peranti menggunakan Token Sinkronisasi.",
-    sync_push: "Tolak Data",
-    sync_pull: "Tarik Data",
-    sync_token_label: "Token Sinkronisasi (Salin/Tampal)",
-    sync_token_placeholder: "Tampal token di sini untuk memuatkan data...",
-    sync_last: "Terakhir dikemas kini",
-
-    // Categories
+    sync_title: "Awan ASiS (Cloud)",
+    sync_desc: "Gunakan Tolak/Tarik untuk mengemas kini data antara peranti.",
+    sync_push: "Tolak Data (Hantar)",
+    sync_pull: "Tarik Data (Ambil)",
+    sync_token_label: "Pusat Data",
+    sync_token_placeholder: "Data disinkronkan secara automatik...",
+    sync_last: "Terakhir disinkronkan",
     cat_akademik: "Akademik",
     cat_koko: "Kokurikulum",
     cat_sahsiah: "Sahsiah",
     cat_3k: "3K",
     cat_demerit: "Demerit",
-
-    // Grades
     grade_prefix: "Tingkatan",
     grade_all: "Semua Tingkatan",
-
-    // Sidebar
     nav_dashboard: "Papan Pemuka",
     nav_students: "Murid",
     nav_cases: "Kes Disiplin",
     nav_admin: "Admin",
     nav_account: "Akaun Guru",
-    
-    // Dashboard
     dash_enrolment: "Enrolmen Murid",
     dash_merit_total: "Merit Terkumpul",
     dash_demerit_total: "Demerit Terkumpul",
@@ -57,29 +46,23 @@ export const translations = {
     dash_filter_house: "Rumah",
     dash_filter_class: "Kelas",
     dash_no_data: "Tiada data tersedia.",
-    
-    // Student List
     sl_search_placeholder: "Cari nama murid atau kelas...",
     sl_all_houses: "Semua Rumah",
     sl_select_all: "Pilih Semua",
     sl_deselect_all: "Batal Pilihan",
     sl_give_points: "Berikan Mata",
     sl_no_students: "Tiada murid ditemui.",
-
-    // Student Detail
     sd_title: "Profil Murid",
     sd_back_dir: "Kembali ke Direktori",
     sd_total_merit: "Jumlah Mata Merit",
     sd_ai_analysis: "Analisis AI",
-    sd_ai_desc: "Jana ulasan tingkah laku profesional menggunakan AI.",
+    sd_ai_desc: "Gunakan AI untuk menganalisis trend sahsiah murid secara profesional.",
     sd_ai_generating: "Menjana...",
     sd_ai_generate: "Analisis Tingkah Laku",
     sd_confirm_title: "Sahkan Kemasukan",
     sd_record_entry: "Kemasukan Rekod",
     sd_timeline: "Garis Masa",
     sd_no_records: "Tiada rekod.",
-
-    // Case Management
     case_room: "Bilik Gerakan Disiplin",
     case_desc: "Pusat pemantauan kes disiplin dan tindakan tatatertib sekolah.",
     case_reg: "Daftar Kes",
@@ -96,18 +79,12 @@ export const translations = {
     case_cat_drugs: "Vape/Rokok/Dadah",
     case_cat_sexual: "Salah Laku Seksual",
     case_cat_others: "Lain-lain",
-
-    // Severity
     sev_minor: "Ringan",
     sev_major: "Sederhana",
     sev_severe: "Berat",
-
-    // Status
     status_pending: "Menunggu",
     status_investigating: "Siasatan",
     status_resolved: "Selesai",
-
-    // Admin
     adm_title: "Portal Pentadbiran",
     adm_tab_students: "Pengurusan Murid",
     adm_tab_teachers: "Pengurusan Guru",
@@ -123,8 +100,6 @@ export const translations = {
     adm_promotion_desc: "Naikkan semua murid ke tingkatan seterusnya.",
     adm_add_batch: "Tambah Batch F1",
     adm_add_batch_desc: "Tambah 100 murid baharu secara rawak.",
-
-    // Account Page
     acc_update_profile: "Kemas Kini Profil",
     acc_subjects: "Mata Pelajaran Diajar",
     acc_security: "Keselamatan & Kata Laluan",
@@ -144,8 +119,6 @@ export const translations = {
     acc_confirm_logout: "Sahkan Log Keluar",
     acc_logout_desc: "Adakah anda pasti mahu keluar dari sistem?",
     acc_yes_confirm: "Ya, Log Keluar",
-
-    // Login
     login_remember_me: "Ingat Saya"
   },
   en: {
@@ -161,13 +134,13 @@ export const translations = {
     close: "Close",
     yes_confirm: "Yes, Confirm",
     confirm_delete_student: "Delete this student record?",
-    sync_title: "Sync Center",
-    sync_desc: "Move data via Sync Token.",
-    sync_push: "Push Data",
-    sync_pull: "Pull Data",
-    sync_token_label: "Sync Token",
-    sync_token_placeholder: "Paste token here...",
-    sync_last: "Last updated",
+    sync_title: "ASiS Cloud",
+    sync_desc: "Use Push/Pull to keep data consistent between devices.",
+    sync_push: "Push Data (Upload)",
+    sync_pull: "Pull Data (Download)",
+    sync_token_label: "Data Center",
+    sync_token_placeholder: "Auto-synced data...",
+    sync_last: "Last synced",
     cat_akademik: "Academic",
     cat_koko: "Co-curricular",
     cat_sahsiah: "Personality",
@@ -204,7 +177,7 @@ export const translations = {
     sd_back_dir: "Back to Directory",
     sd_total_merit: "Total Merit Points",
     sd_ai_analysis: "AI Analysis",
-    sd_ai_desc: "Generate professional behavior insights using AI.",
+    sd_ai_desc: "Use AI to analyze behavioral trends professionally.",
     sd_ai_generating: "Generating...",
     sd_ai_generate: "Behavioral Analysis",
     sd_confirm_title: "Confirm Entry",
@@ -212,7 +185,7 @@ export const translations = {
     sd_timeline: "Timeline",
     sd_no_records: "No records.",
     case_room: "Disciplinary Ops Center",
-    case_desc: "Monitoring of disciplinary cases.",
+    case_desc: "Monitoring of disciplinary cases and school actions.",
     case_reg: "Register Case",
     case_perps: "Perpetrators",
     case_victims: "Victims",

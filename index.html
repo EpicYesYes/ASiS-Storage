@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASiS - Sistem Pengurusan Merit</title>
+    <title>ASiS - Sistem Merit</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23ffbf00%22/><path d=%22M50 25L25 75H75L50 25Z%22 fill=%22%230000bf%22/><circle cx=%2250%22 cy=%2255%22 r=%228%22 fill=%22white%22/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -39,9 +40,9 @@
             --asis-border: rgba(0, 0, 191, 0.1);
         }
         .dark {
-            --asis-bg: #000080;
+            --asis-bg: #000040;
             --asis-text: #d8d8ff;
-            --asis-card: #000066;
+            --asis-card: #000033;
             --asis-border: rgba(216, 216, 255, 0.1);
         }
         body {
@@ -49,46 +50,21 @@
             transition: background-color 0.3s ease, color 0.3s ease;
             background-color: var(--asis-bg);
             color: var(--asis-text);
+            overflow-x: hidden;
         }
-
         input, select, textarea {
             background-color: var(--asis-card) !important;
             color: var(--asis-text) !important;
             border-color: var(--asis-border) !important;
         }
-
-        option {
-            background-color: var(--asis-card);
-            color: var(--asis-text);
-        }
-
-        button, .btn-transition {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         button {
             color: var(--asis-text) !important;
         }
-
-        button.bg-asis-primary,
-        button:hover:not(.no-hover-gold),
-        .active-gold-text {
+        button.bg-asis-primary {
             color: #0000bf !important;
         }
-
-        button.bg-rose-500, button.bg-rose-600, button.bg-emerald-500, button.bg-emerald-600 {
+        button.bg-rose-500, button.bg-rose-600, button.bg-emerald-500, button.bg-emerald-600, button.text-white {
             color: #ffffff !important;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ffbf00;
-            border-radius: 4px;
         }
         .asis-card-shadow {
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);

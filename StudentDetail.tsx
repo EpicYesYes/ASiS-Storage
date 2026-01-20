@@ -22,6 +22,36 @@ interface PendingUpdate {
   points: number;
 }
 
+const compressImage = (base64Str: string, maxWidth = 200, maxHeight = 200): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.6)); // Aggressive JPEG compression for storage efficiency
+    };
+  });
+};
+
 const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack, onUpdate, onUpdateAvatar, onRemove, t }) => {
   const [insight, setInsight] = useState<string | null>(null);
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
@@ -63,7 +93,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
       if (parts) {
         for (const part of parts) {
           if (part.inlineData && typeof part.inlineData.data === 'string') {
-            onUpdateAvatar(student.id, `data:image/png;base64,${part.inlineData.data}`);
+            const compressed = await compressImage(`data:image/png;base64,${part.inlineData.data}`);
+            onUpdateAvatar(student.id, compressed);
             break;
           }
         }
@@ -79,14 +110,10 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student, teacher, onBack,
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // LIMIT: 1MB to prevent local storage quota crash (blank screen bug)
-      if (file.size > 1024 * 1024) {
-        alert("Fail terlalu besar! Sila pilih fail di bawah 1MB.");
-        return;
-      }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        onUpdateAvatar(student.id, reader.result as string);
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result as string);
+        onUpdateAvatar(student.id, compressed);
       };
       reader.readAsDataURL(file);
     }
