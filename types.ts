@@ -8,37 +8,58 @@ export enum MeritCategory {
   AKADEMIK = 'AKADEMIK',
   KOKURIKULUM = 'KOKURIKULUM',
   SAHSIAH = 'SAHSIAH',
-  TIGAK = '3K' // Kebersihan, Kesihatan, Keselamatan
+  TIGAK = '3K'
 }
 
+// Student record interface for individual merit/demerit entries
 export interface StudentRecord {
   id: string;
+  studentId: string;
+  teacherId: string;
+  teacherName: string;
   type: BehaviorType;
   category?: MeritCategory | string;
   reason: string;
   points: number;
   timestamp: number;
-  teacherName: string;
 }
 
+// Student interface updated with optional records and totalPoints to fix missing property errors
 export interface Student {
   id: string;
   firstName: string;
   lastName: string;
   grade: number;
-  classGroup: string; // e.g., "7A", "10C"
+  classGroup: string;
   house: string;
-  totalPoints: number;
   avatar: string;
-  records: StudentRecord[];
+  records?: StudentRecord[];
+  totalPoints?: number;
 }
 
+// Teacher profile updated with optional fields used in AccountPage
+export interface TeacherProfile {
+  id: string;
+  name: string;
+  roles: string[];
+  email: string;
+  staffId: string;
+  avatar: string;
+  subjects: string[];
+  isAdmin: boolean;
+  password?: string;
+  department?: string;
+  meritsGiven?: number;
+  demeritsGiven?: number;
+}
+
+// Missing BehaviorReason interface used in constants.tsx
 export interface BehaviorReason {
   id: string;
   label: string;
   points: number;
   type: BehaviorType;
-  category?: MeritCategory;
+  category?: MeritCategory | string;
 }
 
 export enum CaseSeverity {
@@ -66,21 +87,6 @@ export interface DisciplinaryCase {
   severity: CaseSeverity;
   status: CaseStatus;
   loggedBy: string;
-}
-
-export interface TeacherProfile {
-  id: string;
-  name: string;
-  roles: string[];
-  email: string;
-  staffId: string;
-  department: string;
-  meritsGiven: number;
-  demeritsGiven: number;
-  avatar: string;
-  subjects: string[];
-  isAdmin: boolean;
-  password?: string;
 }
 
 export type View = 'dashboard' | 'students' | 'student-detail' | 'admin' | 'account' | 'cases';

@@ -62,7 +62,8 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     };
 
     students.forEach(s => {
-      s.records.forEach(r => {
+      // Use optional chaining and default to empty array
+      (s.records || []).forEach(r => {
         const points = Math.abs(r.points);
         if (r.type === BehaviorType.MERIT) {
           totalMerits++;
@@ -92,8 +93,9 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     } else if (filterType === 'class' && filterValue) {
       list = list.filter(s => s.classGroup === String(filterValue));
     }
-    const top = [...list].sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 5);
-    const bottom = [...list].sort((a, b) => a.totalPoints - b.totalPoints).slice(0, 5);
+    // Handle optional totalPoints with fallback for sorting
+    const top = [...list].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0)).slice(0, 5);
+    const bottom = [...list].sort((a, b) => (a.totalPoints || 0) - (b.totalPoints || 0)).slice(0, 5);
     return { top, bottom };
   }, [students, filterType, filterValue]);
 
@@ -226,7 +228,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
                       </Bar>
                       <Bar name="Demerit" dataKey="Demerit" radius={[4, 4, 0, 0]} barSize={12}>
                         {(card.data as any[]).map((entry, i) => (
-                          <Cell key={i} fill={darkenColor(idx === 0 ? HOUSE_COLORS[entry.name] : batchColors[entry.grade] || '#cbd5e1', 40)} />
+                          <Cell key={i} fill={darkenColor(idx === 0 ? HOUSE_COLORS[entry.name] : (batchColors[entry.grade] || '#cbd5e1'), 40)} />
                         ))}
                       </Bar>
                     </BarChart>
