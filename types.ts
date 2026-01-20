@@ -11,7 +11,6 @@ export enum MeritCategory {
   TIGAK = '3K'
 }
 
-// Student record interface for individual merit/demerit entries
 export interface StudentRecord {
   id: string;
   studentId: string;
@@ -24,7 +23,6 @@ export interface StudentRecord {
   timestamp: number;
 }
 
-// Student interface updated with optional records and totalPoints to fix missing property errors
 export interface Student {
   id: string;
   firstName: string;
@@ -37,7 +35,6 @@ export interface Student {
   totalPoints?: number;
 }
 
-// Teacher profile updated with optional fields used in AccountPage
 export interface TeacherProfile {
   id: string;
   name: string;
@@ -53,7 +50,6 @@ export interface TeacherProfile {
   demeritsGiven?: number;
 }
 
-// Missing BehaviorReason interface used in constants.tsx
 export interface BehaviorReason {
   id: string;
   label: string;

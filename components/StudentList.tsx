@@ -46,7 +46,8 @@ const StudentList: React.FC<StudentListProps> = ({ students, onSelectStudent, on
     });
   }, [students, searchTerm, gradeFilter, houseFilter, classFilter, sortField, sortOrder]);
 
-  const handleApplyBatch = (reasonKey: string, points: number, type: BehaviorType, category?: MeritCategory) => {
+  // Updated signature to allow string in category to match StudentRecord/BehaviorReason types
+  const handleApplyBatch = (reasonKey: string, points: number, type: BehaviorType, category?: MeritCategory | string) => {
     onBatchAction(selectedIds, { reason: t(reasonKey as any), points, type, category });
     setSelectedIds([]);
     setShowBatchModal(false);
@@ -149,7 +150,8 @@ const StudentList: React.FC<StudentListProps> = ({ students, onSelectStudent, on
           <div className="bg-asis-card rounded-[3rem] shadow-2xl max-w-2xl w-full p-10 border-t-8 border-asis-primary border-asis-border border transition-colors duration-300">
             <h3 className="text-2xl font-black mb-8">{t('sl_give_points')} ({selectedIds.length} {t('nav_students')})</h3>
             <div className="flex bg-asis-bg/50 p-1 rounded-2xl mb-8 border border-asis-border">
-              {Object.values(MeritCategory).map(cat => (
+              {/* Added explicit cast to MeritCategory[] to fix type error by ensuring 'cat' matches setBatchTab parameter type */}
+              {(Object.values(MeritCategory) as MeritCategory[]).map(cat => (
                 <button key={cat} onClick={() => setBatchTab(cat)} className={`flex-1 px-4 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${batchTab === cat ? 'bg-asis-primary shadow-md' : 'opacity-40'}`}>
                    {cat === MeritCategory.AKADEMIK ? t('cat_akademik') : 
                     cat === MeritCategory.KOKURIKULUM ? t('cat_koko') : 
