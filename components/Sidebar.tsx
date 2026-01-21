@@ -27,22 +27,25 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isOpen, onClose,
   ];
 
   return (
-    <aside className={`
-      fixed lg:static inset-y-0 left-0 z-50 w-64 bg-asis-card text-asis-text flex flex-col shrink-0 border-r border-asis-border
-      transition-transform duration-300 ease-in-out transform 
-      ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-    `}>
+    <aside 
+      className={`
+        fixed lg:static inset-y-0 left-0 z-[60] w-64 bg-asis-card text-asis-text flex flex-col shrink-0 border-r border-asis-border
+        transition-transform duration-300 ease-in-out transform 
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}
+      style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+    >
       <div className="p-8 mb-4 border-b border-asis-border flex items-center justify-between">
         <div className="flex flex-col">
           <span className="text-4xl font-black tracking-tighter leading-none">ASiS</span>
           <span className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-2">{t('school_name')}</span>
         </div>
-        <button onClick={onClose} className="lg:hidden p-2 opacity-40 hover:opacity-100 transition-colors">
+        <button onClick={onClose} className="lg:hidden p-2 opacity-40 hover:opacity-100 transition-colors pointer-events-auto">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 
-      <nav className="flex-1 px-4 mt-6 space-y-2">
+      <nav className="flex-1 px-4 mt-6 space-y-2 pointer-events-auto">
         {items.map((item) => {
           const isActive = activeView === item.id || (activeView === 'student-detail' && item.id === 'students');
           return (
@@ -62,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isOpen, onClose,
         })}
       </nav>
 
-      <div className="p-6 mt-auto">
+      <div className="p-6 mt-auto pointer-events-auto">
         <div className="bg-asis-text/5 rounded-2xl p-4 border border-asis-border">
           <p className="text-[10px] opacity-40 uppercase font-black tracking-widest mb-2">{t('system_status')}</p>
           <div className="flex items-center gap-2 mb-1">

@@ -7,6 +7,7 @@ const boyLastNames = ['Ali', 'Abdullah', 'Tan', 'Subramaniam', 'Ibrahim', 'Nasir
 const separators = ['bin', 'a/l', 'anak'];
 
 export const generateMockData = (count: number) => {
+  const timestamp = Date.now();
   const students: Student[] = Array.from({ length: count }, (_, i) => {
     const fName = boyFirstNames[Math.floor(Math.random() * boyFirstNames.length)];
     const lName = boyLastNames[Math.floor(Math.random() * boyLastNames.length)];
@@ -18,7 +19,7 @@ export const generateMockData = (count: number) => {
 
     const grade = GRADES[Math.floor(Math.random() * GRADES.length)];
     const className = CLASS_NAMES[Math.floor(Math.random() * CLASS_NAMES.length)];
-    const id = `std-${Date.now()}-${i}`;
+    const id = `std-${timestamp}-${i}-${Math.floor(Math.random() * 10000)}`;
 
     return {
       id,
@@ -37,7 +38,7 @@ export const generateMockData = (count: number) => {
     for(let j = 0; j < recordCount; j++) {
       const isMerit = Math.random() > 0.4;
       records.push({
-        id: `rec-${s.id}-${j}`,
+        id: `rec-${s.id}-${j}-${Math.floor(Math.random() * 1000)}`,
         studentId: s.id,
         teacherId: 'admin-1',
         teacherName: 'Admin Sistem',

@@ -3,11 +3,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ASiS - Sistem Merit</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23ffbf00%22/><path d=%22M50 25L25 75H75L50 25Z%22 fill=%22%230000bf%22/><circle cx=%2250%22 cy=%2255%22 r=%228%22 fill=%22white%22/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        window.process = window.process || { env: { API_KEY: "" } };
+        
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -47,10 +49,22 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
             background-color: var(--asis-bg);
             color: var(--asis-text);
-            overflow-x: hidden;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        #root { height: 100%; }
+        .scrolling-touch { -webkit-overflow-scrolling: touch; }
+        
+        /* Custom scrollbar for desktop */
+        @media (min-width: 1024px) {
+          ::-webkit-scrollbar { width: 8px; }
+          ::-webkit-scrollbar-track { background: var(--asis-bg); }
+          ::-webkit-scrollbar-thumb { background: var(--asis-border); border-radius: 10px; }
+          ::-webkit-scrollbar-thumb:hover { background: var(--asis-primary); }
         }
     </style>
 <script type="importmap">

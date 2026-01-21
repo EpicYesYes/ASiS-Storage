@@ -9,6 +9,7 @@ interface DashboardProps {
   onSelectStudent: (id: string) => void;
   batchColors: Record<number, string>;
   t: (key: any) => string;
+  onSeed?: () => void;
 }
 
 type RankFilterType = 'all' | 'grade' | 'house' | 'class';
@@ -23,7 +24,7 @@ const darkenColor = (hex: string, percent: number) => {
   return "#" + (0x1000000 + clamp(R) * 0x10000 + clamp(G) * 0x100 + clamp(B)).toString(16).slice(1);
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchColors, t }) => {
+const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchColors, t, onSeed }) => {
   const [filterType, setFilterType] = useState<RankFilterType>('all');
   const [filterValue, setFilterValue] = useState<string | number>('');
   const [isMounted, setIsMounted] = useState(false);
@@ -62,7 +63,6 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     };
 
     students.forEach(s => {
-      // Use optional chaining and default to empty array
       (s.records || []).forEach(r => {
         const points = Math.abs(r.points);
         if (r.type === BehaviorType.MERIT) {
@@ -93,7 +93,6 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     } else if (filterType === 'class' && filterValue) {
       list = list.filter(s => s.classGroup === String(filterValue));
     }
-    // Handle optional totalPoints with fallback for sorting
     const top = [...list].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0)).slice(0, 5);
     const bottom = [...list].sort((a, b) => (a.totalPoints || 0) - (b.totalPoints || 0)).slice(0, 5);
     return { top, bottom };
@@ -103,8 +102,8 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     name: house,
     fullName: house,
     display: house[0],
-    Merit: stats.housePointsMap[house].merits,
-    Demerit: stats.housePointsMap[house].demerits
+    Merit: stats.housePointsMap[house]?.merits || 0,
+    Demerit: stats.housePointsMap[house]?.demerits || 0
   }));
 
   const batchData = GRADES.map(grade => ({
@@ -112,8 +111,8 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
     fullName: `${t('grade_prefix')} ${grade}`,
     display: `${t('grade_prefix')[0]}${grade}`,
     grade: grade,
-    Merit: stats.batchPointsMap[grade].merits,
-    Demerit: stats.batchPointsMap[grade].demerits
+    Merit: stats.batchPointsMap[grade]?.merits || 0,
+    Demerit: stats.batchPointsMap[grade]?.demerits || 0
   }));
 
   const categoryPieData = [
@@ -144,7 +143,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
         <img 
           src={student.avatar} 
           alt={`Foto ${student.firstName}`} 
-          className={`w-20 h-20 rounded-2xl object-cover border-4 border-asis-card shadow-md group-hover:scale-110 transition-transform ${isTop ? 'ring-2 ring-emerald-500/20' : 'ring-2 ring-rose-500/20'}`} 
+          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-4 border-asis-card shadow-md group-hover:scale-110 transition-transform ${isTop ? 'ring-2 ring-emerald-500/20' : 'ring-2 ring-rose-500/20'}`} 
         />
         <div 
           className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-2 border-asis-card shadow-sm flex items-center justify-center text-[10px] text-white font-black" 
@@ -157,15 +156,33 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
         {formatShortName(student.firstName, student.lastName)}
       </h4>
       <p className="text-[9px] font-black uppercase tracking-widest mt-1 opacity-40 group-hover:opacity-70">{student.classGroup}</p>
-      <div className={`mt-2 text-base font-black ${isTop ? 'text-emerald-500' : 'text-rose-500'}`}>
+      <div className={`mt-2 text-sm sm:text-base font-black ${isTop ? 'text-emerald-500' : 'text-rose-500'}`}>
         {student.totalPoints} <span className="text-[8px] uppercase font-black opacity-70">pts</span>
       </div>
     </div>
   );
 
+  if (students.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40 bg-asis-card rounded-[3rem] border-4 border-dashed border-asis-border animate-in fade-in zoom-in text-center p-8">
+        <div className="w-24 h-24 bg-asis-primary/20 rounded-full flex items-center justify-center text-asis-primary mb-6">
+          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <h2 className="text-3xl font-black mb-4">Pangkalan Data Kosong</h2>
+        <p className="opacity-60 max-w-md font-medium leading-relaxed mb-8">Sistem mengesan tiada rekod murid dalam pangkalan data peranti anda. Sila mulakan sistem semula.</p>
+        <button 
+          onClick={onSeed} 
+          className="px-12 py-5 bg-asis-primary !text-[#0000bf] font-black rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-sm"
+        >
+          Jana Semula 550 Murid
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 pb-20 text-asis-text">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-asis-card p-6 rounded-3xl border border-asis-border shadow-sm flex items-center gap-4 transition-colors duration-300">
           <div className="w-12 h-12 bg-asis-primary/20 rounded-2xl flex items-center justify-center text-asis-primary">
              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -252,19 +269,19 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
         ))}
       </div>
 
-      <div className="bg-asis-card/40 p-6 sm:p-10 rounded-[3rem] border border-asis-border space-y-10 transition-colors duration-300">
+      <div className="bg-asis-card/40 p-4 sm:p-10 rounded-[3rem] border border-asis-border space-y-10 transition-colors duration-300">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div>
             <h3 className="text-2xl font-black">{t('dash_analysis')}</h3>
             <p className="opacity-60 text-sm font-medium italic">{t('sd_ai_desc')}</p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex bg-asis-card p-1 rounded-2xl shadow-sm border border-asis-border">
+            <div className="flex bg-asis-card p-1 rounded-2xl shadow-sm border border-asis-border overflow-x-auto">
               {(['all', 'grade', 'house', 'class'] as RankFilterType[]).map((type) => (
                 <button 
                   key={type} 
                   onClick={() => handleFilterTypeChange(type)} 
-                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterType === type ? 'bg-asis-primary' : 'bg-transparent'}`}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filterType === type ? 'bg-asis-primary' : 'bg-transparent'}`}
                 >
                   {type === 'all' ? t('dash_filter_school') : type === 'grade' ? t('dash_filter_batch') : type === 'house' ? t('dash_filter_house') : t('dash_filter_class')}
                 </button>
@@ -305,7 +322,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, onSelectStudent, batchC
                  <h4 className={`text-xs font-black text-${sec.color}-500 uppercase tracking-[0.2em]`}>{sec.title}</h4>
                  {filterType !== 'all' && <span className="text-[10px] font-black opacity-30 uppercase tracking-widest">{filterValue}</span>}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4">
                 {sec.data.length > 0 ? sec.data.map((s, idx) => renderStudentCard(s, sec.isTop, idx)) : <div className="col-span-full py-10 text-center opacity-40 italic font-black">{t('dash_no_data')}</div>}
               </div>
             </div>

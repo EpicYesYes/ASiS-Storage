@@ -128,109 +128,134 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
   };
 
   return (
-    <div className="space-y-8 pb-20 animate-in fade-in duration-500 text-asis-text">
-      <div className="bg-asis-card p-8 rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <div className="space-y-6 sm:space-y-8 pb-20 animate-in fade-in duration-500 text-asis-text">
+      {/* Header Card */}
+      <div className="bg-asis-card p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-asis-border shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
         <div className="flex-1">
-          <h2 className="text-3xl font-black">{t('case_room')}</h2>
-          <p className="opacity-60 mt-1 font-medium italic text-sm">{t('case_desc')}</p>
+          <h2 className="text-2xl sm:text-3xl font-black">{t('case_room')}</h2>
+          <p className="opacity-60 mt-1 font-medium italic text-xs">{t('case_desc')}</p>
         </div>
-        <div className="flex items-center gap-4">
-          <input type="text" placeholder="Cari kes..." className="bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-3 font-black outline-none focus:border-asis-primary" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-          <button onClick={() => setShowAddModal(true)} className="px-8 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest">{t('case_reg')}</button>
+        <div className="flex items-center gap-2 sm:gap-4 w-full lg:w-auto">
+          <input 
+            type="text" 
+            placeholder="Cari kes..." 
+            className="flex-1 lg:w-64 bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 font-black outline-none focus:border-asis-primary min-w-0" 
+            value={searchTerm} 
+            onChange={e => setSearchTerm(e.target.value)} 
+          />
+          <button 
+            onClick={() => setShowAddModal(true)} 
+            className="shrink-0 px-4 sm:px-8 py-3 bg-asis-primary !text-[#0000bf] font-black rounded-xl sm:rounded-2xl shadow-xl uppercase text-[10px] sm:text-xs tracking-widest whitespace-nowrap"
+          >
+            {t('case_reg')}
+          </button>
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-2">
+      {/* Filters and Sorting Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {(['ALL', CaseStatus.PENDING, CaseStatus.INVESTIGATING, CaseStatus.RESOLVED] as const).map(status => (
-            <button key={status} onClick={() => setStatusFilter(status)} className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${statusFilter === status ? 'bg-asis-primary border-asis-primary' : 'bg-asis-card opacity-50 border-asis-border'}`}>{getStatusLabel(status)}</button>
+            <button 
+              key={status} 
+              onClick={() => setStatusFilter(status)} 
+              className={`px-3 sm:px-5 py-2 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black uppercase border-2 transition-all flex-1 sm:flex-none whitespace-nowrap ${statusFilter === status ? 'bg-asis-primary border-asis-primary shadow-sm' : 'bg-asis-card opacity-50 border-asis-border'}`}
+            >
+              {getStatusLabel(status)}
+            </button>
           ))}
         </div>
-        <div className="flex bg-asis-card p-1 rounded-xl border border-asis-border">
-          <button onClick={() => setSortMethod('DATE')} className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${sortMethod === 'DATE' ? 'bg-asis-primary shadow-sm' : 'opacity-40 hover:opacity-100'}`}>Tarikh</button>
-          <button onClick={() => setSortMethod('SEVERITY')} className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${sortMethod === 'SEVERITY' ? 'bg-asis-primary shadow-sm' : 'opacity-40 hover:opacity-100'}`}>Keparahan</button>
+        <div className="flex bg-asis-card p-1 rounded-xl border border-asis-border self-end sm:self-auto">
+          <button onClick={() => setSortMethod('DATE')} className={`px-4 py-2 rounded-lg text-[9px] sm:text-[10px] font-black uppercase transition-all whitespace-nowrap ${sortMethod === 'DATE' ? 'bg-asis-primary shadow-sm' : 'opacity-40 hover:opacity-100'}`}>Tarikh</button>
+          <button onClick={() => setSortMethod('SEVERITY')} className={`px-4 py-2 rounded-lg text-[9px] sm:text-[10px] font-black uppercase transition-all whitespace-nowrap ${sortMethod === 'SEVERITY' ? 'bg-asis-primary shadow-sm' : 'opacity-40 hover:opacity-100'}`}>Keparahan</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Grid of Cases */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {filteredCases.map(c => (
-          <div key={c.id} onClick={() => { setSelectedCase(c); setFinalDecision(c.decision); }} className="bg-asis-card p-8 rounded-[2.5rem] border border-asis-border shadow-lg cursor-pointer hover:shadow-2xl transition-all group relative overflow-hidden">
+          <div key={c.id} onClick={() => { setSelectedCase(c); setFinalDecision(c.decision); }} className="bg-asis-card p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-asis-border shadow-lg cursor-pointer hover:shadow-2xl transition-all group relative overflow-hidden">
             <div className="flex justify-between items-start mb-4">
-              <span className="px-3 py-1 bg-asis-bg text-asis-text opacity-60 text-[10px] font-black uppercase tracking-widest rounded-lg">{getTranslatedCategory(c.category)}</span>
-              <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase border ${c.severity === CaseSeverity.SEVERE ? 'bg-rose-500/10 text-rose-500 border-rose-500' : c.severity === CaseSeverity.MAJOR ? 'bg-amber-500/10 text-amber-500 border-amber-500' : 'bg-asis-bg border-asis-border'}`}>
+              <span className="px-3 py-1 bg-asis-bg text-asis-text opacity-60 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-lg">{getTranslatedCategory(c.category)}</span>
+              <span className={`px-3 py-1 rounded-lg text-[9px] sm:text-[10px] font-black uppercase border ${c.severity === CaseSeverity.SEVERE ? 'bg-rose-500/10 text-rose-500 border-rose-500' : c.severity === CaseSeverity.MAJOR ? 'bg-amber-500/10 text-amber-500 border-amber-500' : 'bg-asis-bg border-asis-border'}`}>
                 {getSeverityLabel(c.severity)}
               </span>
             </div>
-            <h3 className="text-xl font-black group-hover:text-asis-primary transition-colors">{c.title}</h3>
-            <p className="opacity-40 text-sm mt-2 line-clamp-2">"{c.description}"</p>
+            <h3 className="text-lg sm:text-xl font-black group-hover:text-asis-primary transition-colors leading-tight">{c.title}</h3>
+            <p className="opacity-40 text-xs sm:text-sm mt-2 line-clamp-2">"{c.description}"</p>
             <div className="mt-6 pt-6 border-t border-asis-border flex justify-between items-center">
-              <span className="text-[10px] font-black uppercase opacity-40">{new Date(c.date).toLocaleDateString()}</span>
-              <span className={`text-[10px] font-black uppercase ${c.status === CaseStatus.RESOLVED ? 'text-emerald-500' : 'opacity-40'}`}>{getStatusLabel(c.status)}</span>
+              <span className="text-[9px] sm:text-[10px] font-black uppercase opacity-40">{new Date(c.date).toLocaleDateString()}</span>
+              <span className={`text-[9px] sm:text-[10px] font-black uppercase ${c.status === CaseStatus.RESOLVED ? 'text-emerald-500' : 'opacity-40'}`}>{getStatusLabel(c.status)}</span>
             </div>
           </div>
         ))}
+        {filteredCases.length === 0 && <div className="col-span-full py-20 text-center opacity-30 italic font-black">Tiada kes ditemui.</div>}
       </div>
 
       {/* Details Modal */}
       {selectedCase && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
-          <div className="bg-asis-card rounded-[3rem] shadow-2xl max-w-4xl w-full p-12 my-auto border border-asis-border relative animate-in zoom-in-95">
-            <button onClick={() => setSelectedCase(null)} className="absolute top-8 right-8 p-3 hover:bg-asis-bg rounded-2xl transition-all"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-asis-card rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl max-w-4xl w-full p-6 sm:p-12 my-auto border border-asis-border relative animate-in zoom-in-95">
+            <button onClick={() => setSelectedCase(null)} className="absolute top-4 right-4 sm:top-8 sm:right-8 p-2 sm:p-3 hover:bg-asis-bg rounded-xl sm:rounded-2xl transition-all"><svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
             
-            <div className="flex items-center gap-4 mb-8">
-               <span className="px-5 py-2 bg-asis-primary !text-[#0000bf] text-xs font-black uppercase tracking-widest rounded-xl">{getTranslatedCategory(selectedCase.category)}</span>
-               <span className={`px-5 py-2 text-xs font-black uppercase tracking-widest rounded-xl border ${selectedCase.severity === CaseSeverity.SEVERE ? 'bg-rose-500/10 text-rose-500 border-rose-500' : 'bg-asis-bg border-asis-border'}`}>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
+               <span className="px-3 sm:px-5 py-1.5 sm:py-2 bg-asis-primary !text-[#0000bf] text-[9px] sm:text-xs font-black uppercase tracking-widest rounded-lg sm:rounded-xl">{getTranslatedCategory(selectedCase.category)}</span>
+               <span className={`px-3 sm:px-5 py-1.5 sm:py-2 text-[9px] sm:text-xs font-black uppercase tracking-widest rounded-lg sm:rounded-xl border ${selectedCase.severity === CaseSeverity.SEVERE ? 'bg-rose-500/10 text-rose-500 border-rose-500' : 'bg-asis-bg border-asis-border'}`}>
                 {getSeverityLabel(selectedCase.severity)}
                </span>
-               <span className={`px-5 py-2 text-xs font-black uppercase tracking-widest rounded-xl border ${selectedCase.status === CaseStatus.RESOLVED ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500' : 'bg-asis-bg border-asis-border'}`}>
+               <span className={`px-3 sm:px-5 py-1.5 sm:py-2 text-[9px] sm:text-xs font-black uppercase tracking-widest rounded-lg sm:rounded-xl border ${selectedCase.status === CaseStatus.RESOLVED ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500' : 'bg-asis-bg border-asis-border'}`}>
                 {getStatusLabel(selectedCase.status)}
                </span>
             </div>
 
-            <h2 className="text-4xl font-black mb-4">{selectedCase.title}</h2>
-            <p className="text-xl opacity-60 italic leading-relaxed mb-8">"{selectedCase.description}"</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-4 leading-tight">{selectedCase.title}</h2>
+            <p className="text-base sm:text-xl opacity-60 italic leading-relaxed mb-8">"{selectedCase.description}"</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-asis-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 pt-6 sm:pt-8 border-t border-asis-border">
               <div className="space-y-6">
                 <div>
-                  <label className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_perps')}</label>
+                  <label className="text-[9px] sm:text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_perps')}</label>
                   <div className="mt-2 space-y-2">
                     {selectedCase.perpetratorIds.map(id => {
                       const s = students.find(x => x.id === id);
-                      return s && <div key={id} onClick={() => { onSelectStudent(id); setSelectedCase(null); }} className="p-4 bg-asis-bg/30 border border-asis-border rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-asis-primary transition-all group"><img src={s.avatar} className="w-10 h-10 rounded-xl object-cover" alt="" /><p className="font-black group-hover:text-[#0000bf]">{s.firstName} {s.lastName}</p></div>;
+                      return s && <div key={id} onClick={() => { onSelectStudent(id); setSelectedCase(null); }} className="p-3 sm:p-4 bg-asis-bg/30 border border-asis-border rounded-xl sm:rounded-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:bg-asis-primary transition-all group"><img src={s.avatar} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl object-cover" alt="" /><p className="font-black text-xs sm:text-sm group-hover:text-[#0000bf]">{s.firstName} {s.lastName}</p></div>;
                     })}
                   </div>
                 </div>
                 {selectedCase.victimIds.length > 0 && (
                   <div>
-                    <label className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_victims')}</label>
+                    <label className="text-[9px] sm:text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_victims')}</label>
                     <div className="mt-2 space-y-2">
                       {selectedCase.victimIds.map(id => {
                         const s = students.find(x => x.id === id);
-                        return s && <div key={id} onClick={() => { onSelectStudent(id); setSelectedCase(null); }} className="p-4 bg-asis-bg/30 border border-asis-border rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-asis-primary transition-all group"><img src={s.avatar} className="w-10 h-10 rounded-xl object-cover" alt="" /><p className="font-black group-hover:text-[#0000bf]">{s.firstName} {s.lastName}</p></div>;
+                        return s && <div key={id} onClick={() => { onSelectStudent(id); setSelectedCase(null); }} className="p-3 sm:p-4 bg-asis-bg/30 border border-asis-border rounded-xl sm:rounded-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:bg-asis-primary transition-all group"><img src={s.avatar} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl object-cover" alt="" /><p className="font-black text-xs sm:text-sm group-hover:text-[#0000bf]">{s.firstName} {s.lastName}</p></div>;
                       })}
                     </div>
                   </div>
                 )}
               </div>
               <div className="space-y-6">
-                <div><label className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_location')}</label>
-                  <p className="text-lg font-black mt-1">{selectedCase.location}</p>
-                </div>
-                <div><label className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Didaftarkan Oleh</label>
-                  <p className="text-lg font-black mt-1">{selectedCase.loggedBy}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[9px] sm:text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_location')}</label>
+                    <p className="text-sm sm:text-lg font-black mt-1">{selectedCase.location}</p>
+                  </div>
+                  <div>
+                    <label className="text-[9px] sm:text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Didaftarkan Oleh</label>
+                    <p className="text-sm sm:text-lg font-black mt-1">{selectedCase.loggedBy}</p>
+                  </div>
                 </div>
                 <div className="pt-6 border-t border-asis-border">
-                  <label className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_decision_sec')}</label>
+                  <label className="text-[9px] sm:text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">{t('case_decision_sec')}</label>
                   <textarea 
-                    className="w-full mt-2 bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-4 py-3 font-black text-sm outline-none focus:border-asis-primary"
+                    className="w-full mt-2 bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-4 py-3 font-black text-sm outline-none focus:border-asis-primary min-h-[100px]"
                     placeholder="Masukkan keputusan atau tindakan..."
                     value={finalDecision}
                     onChange={(e) => setFinalDecision(e.target.value)}
                   ></textarea>
                   <div className="flex gap-2 mt-4">
-                    <button onClick={() => handleUpdateStatus(CaseStatus.INVESTIGATING)} className="flex-1 py-3 bg-asis-bg border border-asis-border rounded-xl text-[10px] font-black uppercase tracking-widest">{t('status_investigating')}</button>
-                    <button onClick={() => handleUpdateStatus(CaseStatus.RESOLVED)} className="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">{t('status_resolved')}</button>
+                    <button onClick={() => handleUpdateStatus(CaseStatus.INVESTIGATING)} className="flex-1 py-3 bg-asis-bg border border-asis-border rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{t('status_investigating')}</button>
+                    <button onClick={() => handleUpdateStatus(CaseStatus.RESOLVED)} className="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{t('status_resolved')}</button>
                   </div>
                 </div>
               </div>
@@ -241,24 +266,24 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
 
       {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
-          <div className="bg-asis-card rounded-[3rem] shadow-2xl max-w-2xl w-full p-12 my-auto border border-asis-border animate-in zoom-in-95">
-            <h3 className="text-3xl font-black mb-8">{t('case_reg')}</h3>
-            <form onSubmit={handleAddCaseSubmit} className="space-y-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-asis-card rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl max-w-2xl w-full p-6 sm:p-12 my-auto border border-asis-border animate-in zoom-in-95">
+            <h3 className="text-2xl sm:text-3xl font-black mb-6 sm:mb-8">{t('case_reg')}</h3>
+            <form onSubmit={handleAddCaseSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-1">
-                <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">Tajuk Kes</label>
-                <input required className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black outline-none focus:border-asis-primary" placeholder="cth: Pergaduhan di dewan" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                <label className="text-[9px] sm:text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Tajuk Kes</label>
+                <input required className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-5 sm:px-6 py-3 sm:py-4 font-black outline-none focus:border-asis-primary" placeholder="cth: Pergaduhan di dewan" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
               </div>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">Kategori</label>
-                  <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black cursor-pointer" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+                  <label className="text-[9px] sm:text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Kategori</label>
+                  <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-5 sm:px-6 py-3 sm:py-4 font-black cursor-pointer appearance-none" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                     {CATEGORIES.map(c => <option key={c.key} value={c.value}>{t(c.key as any)}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">Keparahan</label>
-                  <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black cursor-pointer" value={formData.severity} onChange={e => setFormData({...formData, severity: e.target.value as CaseSeverity})}>
+                  <label className="text-[9px] sm:text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Keparahan</label>
+                  <select className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-5 sm:px-6 py-3 sm:py-4 font-black cursor-pointer appearance-none" value={formData.severity} onChange={e => setFormData({...formData, severity: e.target.value as CaseSeverity})}>
                     <option value={CaseSeverity.MINOR}>{t('sev_minor')}</option>
                     <option value={CaseSeverity.MAJOR}>{t('sev_major')}</option>
                     <option value={CaseSeverity.SEVERE}>{t('sev_severe')}</option>
@@ -266,32 +291,32 @@ const CaseManagement: React.FC<CaseManagementProps> = ({
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">{t('case_perps')}</label>
-                <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black mb-2 outline-none focus:border-asis-primary" placeholder="Cari pelaku..." value={formData.perpQuery} onChange={e => setFormData({...formData, perpQuery: e.target.value})} />
+                <label className="text-[9px] sm:text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">{t('case_perps')}</label>
+                <input className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-5 sm:px-6 py-3 sm:py-4 font-black mb-2 outline-none focus:border-asis-primary" placeholder="Cari pelaku..." value={formData.perpQuery} onChange={e => setFormData({...formData, perpQuery: e.target.value})} />
                 {perpSearchResults.length > 0 && (
-                  <div className="bg-asis-bg rounded-2xl p-2 border border-asis-border space-y-1 max-h-40 overflow-y-auto">
+                  <div className="bg-asis-bg rounded-xl sm:rounded-2xl p-2 border border-asis-border space-y-1 max-h-40 overflow-y-auto">
                     {perpSearchResults.map(s => (
-                      <button key={s.id} type="button" onClick={() => setFormData({...formData, selectedPerps: [...new Set([...formData.selectedPerps, s.id])], perpQuery: ''})} className="w-full p-3 hover:bg-asis-primary rounded-xl flex items-center gap-3 font-black text-xs text-left group">
+                      <button key={s.id} type="button" onClick={() => setFormData({...formData, selectedPerps: [...new Set([...formData.selectedPerps, s.id])], perpQuery: ''})} className="w-full p-3 hover:bg-asis-primary rounded-lg sm:rounded-xl flex items-center gap-3 font-black text-xs text-left group">
                         <img src={s.avatar} className="w-6 h-6 rounded-md object-cover" alt="" />
-                        <span className="group-hover:text-[#0000bf]">{s.firstName} {s.lastName}</span>
+                        <span className="group-hover:text-[#0000bf] truncate">{s.firstName} {s.lastName}</span>
                       </button>
                     ))}
                   </div>
                 )}
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2 max-h-24 overflow-y-auto">
                   {formData.selectedPerps.map(id => {
                     const s = students.find(x => x.id === id);
-                    return s && <span key={id} className="px-3 py-1.5 bg-asis-primary rounded-lg text-[10px] font-black uppercase flex items-center gap-2 text-[#0000bf]">{s.firstName} <button type="button" onClick={() => setFormData({...formData, selectedPerps: formData.selectedPerps.filter(x => x !== id)})}>×</button></span>;
+                    return s && <span key={id} className="px-3 py-1.5 bg-asis-primary rounded-lg text-[9px] font-black uppercase flex items-center gap-2 text-[#0000bf] shadow-sm">{s.firstName} <button type="button" onClick={() => setFormData({...formData, selectedPerps: formData.selectedPerps.filter(x => x !== id)})}>×</button></span>;
                   })}
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">Huraian Kes</label>
-                <textarea required className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-2xl px-6 py-4 font-black h-32 outline-none focus:border-asis-primary" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                <label className="text-[9px] sm:text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Huraian Kes</label>
+                <textarea required className="w-full bg-asis-bg/30 border-2 border-asis-border rounded-xl sm:rounded-2xl px-5 sm:px-6 py-3 sm:py-4 font-black h-24 sm:h-32 outline-none focus:border-asis-primary" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
               </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <button type="button" onClick={() => setShowAddModal(false)} className="px-8 py-4 font-black opacity-40 uppercase text-xs tracking-widest hover:opacity-100">Batal</button>
-                <button type="submit" className="px-10 py-4 bg-asis-primary !text-[#0000bf] font-black rounded-2xl shadow-xl uppercase text-xs tracking-widest active:scale-95 transition-all">Daftar Kes</button>
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+                <button type="button" onClick={() => setShowAddModal(false)} className="px-8 py-3 sm:py-4 font-black opacity-40 uppercase text-[10px] sm:text-xs tracking-widest hover:opacity-100 order-2 sm:order-1">Batal</button>
+                <button type="submit" className="px-10 py-3 sm:py-4 bg-asis-primary !text-[#0000bf] font-black rounded-xl sm:rounded-2xl shadow-xl uppercase text-[10px] sm:text-xs tracking-widest active:scale-95 transition-all order-1 sm:order-2">Daftar Kes</button>
               </div>
             </form>
           </div>
